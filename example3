@@ -1,0 +1,5 @@
+(begin
+    (define sum (+ 42 (+ 34 (+ 89 (+ (- 3) (+ 95 (+ 4 (+ (- 9) (32)))))))))
+    (define number 8)
+    (/ sum number)
+)

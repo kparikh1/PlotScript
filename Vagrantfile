@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
   # get rid of annoying console.log file and start the GUI 
   config.vm.provider "virtualbox" do |vb|
     vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
-    vb.gui = true
+    vb.gui = false
   end
 
   # setup the VM

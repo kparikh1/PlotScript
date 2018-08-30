@@ -185,6 +185,9 @@ void Environment::reset(){
   // Built-In value of pi
   envmap.emplace("pi", EnvResult(ExpressionType, Expression(PI)));
 
+  // Built-In value of e
+  envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
+
   // Procedure: add;
   envmap.emplace("+", EnvResult(ProcedureType, add)); 
 

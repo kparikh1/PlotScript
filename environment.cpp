@@ -100,15 +100,34 @@ Expression sqrt(const std::vector<Expression> &args) {
 
   double result = 0;
   // check if one argument
-  if (args.size() != 1) {
+  if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for sqrt");
-  } else if (args.at(0).isHeadNumber() && args.at(0).head().asNumber() > 0) {
-    result = std::sqrt(args.at(0).head().asNumber());
-  } else {
+  else if (args.at(0).isHeadNumber() && args.at(0).head().asNumber() > 0)
+    return Expression(std::sqrt(args.at(0).head().asNumber()));
+  else
     throw SemanticError("Error in call to sqrt, argument not a number");
-  }
-  return Expression(result);
-}
+};
+
+Expression exp(const std::vector<Expression> &args) {
+
+  // Check if 2 args
+  if (args.size() != 2)
+    throw SemanticError("Error: invalid number of arguments for exponential");
+  else if (args.at(0).isHeadNumber() && args.at(1).isHeadNumber())
+    return Expression(std::pow(args.at(0).head().asNumber(), args.at(1).head().asNumber()));
+  else
+    throw SemanticError("Error in call to exponent, argument not a number");
+};
+
+Expression ln(const std::vector<Expression> &args) {
+  // Check if 2 args
+  if (args.size() != 1)
+    throw SemanticError("Error: invalid number of arguments for natural log");
+  else if (args.at(0).isHeadNumber())
+    return Expression(std::log(args.at(0).head().asNumber()));
+  else
+    throw SemanticError("Error in call to natural log, argument not a number");
+};
 
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
@@ -211,4 +230,10 @@ void Environment::reset() {
 
   // Procedure: sqrt;
   envmap.emplace("sqrt", EnvResult(ProcedureType, sqrt));
+
+  // Procedure: pow;
+  envmap.emplace("^", EnvResult(ProcedureType, exp));
+
+  // Procedure: ln;
+  envmap.emplace("ln", EnvResult(ProcedureType, ln));
 }

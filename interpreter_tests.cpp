@@ -200,11 +200,31 @@ TEST_CASE("Test Interpreter result with simple procedures (add)", "[interpreter]
 
 TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter]") {
 
-  { // sqrt, binary case
+  { // sqrt
     std::string program = "(sqrt 4)";
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(2.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]") {
+
+  { // exponent
+    std::string program = "(^ 4 2)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(16.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (ln)", "[interpreter]") {
+
+  { // natural log
+    std::string program = "(ln e)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1.));
   }
 }
 
@@ -332,9 +352,54 @@ TEST_CASE("Test using number as procedure", "[interpreter]") {
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
 
-TEST_CASE("Test invalid sqrt procedure", "[interpreter]") {
+TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
   std::string input = R"(
 (sqrt -4)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple sqrt arguments", "[interpreter]") {
+  std::string input = R"(
+(sqrt 4 2)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple exponent arguments", "[interpreter]") {
+  std::string input = R"(
+(^ 0 1 2)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple natural log arguments", "[interpreter]") {
+  std::string input = R"(
+(ln 0 1)
 )";
 
   Interpreter interp;

@@ -120,13 +120,43 @@ Expression exp(const std::vector<Expression> &args) {
 };
 
 Expression ln(const std::vector<Expression> &args) {
-  // Check if 2 args
+  // Check if 1 args
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for natural log");
   else if (args.at(0).isHeadNumber())
     return Expression(std::log(args.at(0).head().asNumber()));
   else
     throw SemanticError("Error in call to natural log, argument not a number");
+};
+
+Expression sin(const std::vector<Expression> &args) {
+  // Check if 1 args
+  if (args.size() != 1)
+    throw SemanticError("Error: invalid number of arguments for sin");
+  else if (args.at(0).isHeadNumber())
+    return Expression(std::sin(args.at(0).head().asNumber()));
+  else
+    throw SemanticError("Error in call to sin, argument not a number");
+};
+
+Expression cos(const std::vector<Expression> &args) {
+  // Check if 1 args
+  if (args.size() != 1)
+    throw SemanticError("Error: invalid number of arguments for cos");
+  else if (args.at(0).isHeadNumber())
+    return Expression(std::cos(args.at(0).head().asNumber()));
+  else
+    throw SemanticError("Error in call to cos, argument not a number");
+};
+
+Expression tan(const std::vector<Expression> &args) {
+  // Check if 1 args
+  if (args.size() != 1)
+    throw SemanticError("Error: invalid number of arguments for tan");
+  else if (args.at(0).isHeadNumber())
+    return Expression(std::tan(args.at(0).head().asNumber()));
+  else
+    throw SemanticError("Error in call to tan, argument not a number");
 };
 
 const double PI = std::atan2(0, -1);
@@ -236,4 +266,13 @@ void Environment::reset() {
 
   // Procedure: ln;
   envmap.emplace("ln", EnvResult(ProcedureType, ln));
+
+  // Procedure: sin;
+  envmap.emplace("sin", EnvResult(ProcedureType, sin));
+
+  // Procedure: cos;
+  envmap.emplace("cos", EnvResult(ProcedureType, cos));
+
+  // Procedure: tan;
+  envmap.emplace("tan", EnvResult(ProcedureType, tan));
 }

@@ -228,6 +228,36 @@ TEST_CASE("Test Interpreter result with simple procedures (ln)", "[interpreter]"
   }
 }
 
+TEST_CASE("Test Interpreter result with simple procedures (sin)", "[interpreter]") {
+
+  { // Sin
+    std::string program = "(sin (/ pi 2))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (cos)", "[interpreter]") {
+
+  { // cos
+    std::string program = "(cos (/ pi 2))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(0.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (tan)", "[interpreter]") {
+
+  { // tan
+    std::string program = "(tan 0)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(0.));
+  }
+}
+
 TEST_CASE("Test Interpreter special forms: begin and define", "[interpreter]") {
 
   {
@@ -400,6 +430,51 @@ TEST_CASE("Test multiple exponent arguments", "[interpreter]") {
 TEST_CASE("Test multiple natural log arguments", "[interpreter]") {
   std::string input = R"(
 (ln 0 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple sin arguments", "[interpreter]") {
+  std::string input = R"(
+(sin 0 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple cos arguments", "[interpreter]") {
+  std::string input = R"(
+(cos 0 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple tan arguments", "[interpreter]") {
+  std::string input = R"(
+(tan 0 1)
 )";
 
   Interpreter interp;

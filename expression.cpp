@@ -56,6 +56,10 @@ bool Expression::isHeadSymbol() const noexcept {
   return m_head.isSymbol();
 }
 
+bool Expression::isHeadNumCom() const noexcept {
+  return m_head.isNumCom();
+}
+
 void Expression::append(const Atom &a) {
   m_tail.emplace_back(a);
 }

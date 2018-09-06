@@ -213,17 +213,17 @@ TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
     std::string program = "(sqrt -4)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<double>(0, 2)));
+    REQUIRE(result == Expression(std::complex<long double>(0, 2)));
   }
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]") {
 
   { // exponent
-    std::string program = "(^ 4 2)";
+    std::string program = "(^ 4 4)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(16.));
+    REQUIRE(result == Expression(256.));
   }
 }
 

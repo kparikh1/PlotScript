@@ -12,7 +12,7 @@ Atom::Atom(double value) {
   setNumber(value);
 }
 
-Atom::Atom(std::complex<double> comp) {
+Atom::Atom(std::complex<long double> comp) {
 
   setComplex(comp);
 }
@@ -114,7 +114,7 @@ void Atom::setSymbol(const std::string &value) {
   new(&stringValue) std::string(value);
 }
 
-void Atom::setComplex(const std::complex<double> &comp) {
+void Atom::setComplex(const std::complex<long double> &comp) {
 
   m_type = ComplexKind;
   complexValue = comp;
@@ -136,12 +136,12 @@ std::string Atom::asSymbol() const noexcept {
   return result;
 }
 
-std::complex<double> Atom::asComplex() const noexcept {
+std::complex<long double> Atom::asComplex() const noexcept {
 
-  return isComplex() ? complexValue : std::complex<double>(0, 0);
+  return isComplex() ? complexValue : std::complex<long double>(0, 0);
 }
 
-std::complex<double> Atom::getComplex() const noexcept {
+std::complex<long double> Atom::getComplex() const noexcept {
   return complexValue;
 }
 
@@ -161,8 +161,7 @@ bool Atom::operator==(const Atom &right) const noexcept {
     double dleft = complexValue.real();
     double dright = right.complexValue.real();
     double diff = fabs(dleft - dright);
-    if (std::isnan(diff) ||
-        (diff > std::numeric_limits<double>::epsilon()))
+    if (std::isnan(diff) || (diff > std::numeric_limits<double>::epsilon()))
       return false;
   }
     break;

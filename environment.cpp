@@ -30,31 +30,38 @@ Expression default_proc(const std::vector<Expression> &args) {
 Expression add(const std::vector<Expression> &args) {
 
   // check all arguments are numbers, while adding
-  double result = 0;
+  std::complex<double> result(0, 0);
+  bool complex = false;
   for (auto &a :args) {
-    if (a.isHeadNumber() || a.isHeadComplex()) {
+    if (a.isHeadNumber()) {
       result += a.head().asNumber();
+    } else if (a.isHeadComplex()) {
+      result += a.head().asComplex();
+      complex = true;
     } else {
       throw SemanticError("Error in call to add, argument not a number");
     }
   }
-
-  return Expression(result);
+  return complex ? Expression(result) : Expression(result.real());
 };
 
 Expression mul(const std::vector<Expression> &args) {
 
   // check all aruments are numbers, while multiplying
-  double result = 1;
+  std::complex<double> result(1, 1);
+  bool complex = false;
   for (auto &a :args) {
     if (a.isHeadNumber()) {
       result *= a.head().asNumber();
+    } else if (a.isHeadComplex()) {
+      result *= a.head().asComplex();
+      complex = true;
     } else {
       throw SemanticError("Error in call to mul, argument not a number");
     }
   }
 
-  return Expression(result);
+  return complex ? Expression(result) : Expression(result.real());
 };
 
 Expression subneg(const std::vector<Expression> &args) {
@@ -83,18 +90,18 @@ Expression subneg(const std::vector<Expression> &args) {
 
 Expression div(const std::vector<Expression> &args) {
 
-  double result = 0;
-
+  std::complex<double> result(0, 0);
+  bool complex = args[0].isHeadComplex() || args[1].isHeadComplex();
   if (nargs_equal(args, 2)) {
-    if ((args[0].isHeadNumber()) && (args[1].isHeadNumber())) {
-      result = args[0].head().asNumber() / args[1].head().asNumber();
+    if (args[0].head().isNumCom() && args[1].head().isNumCom()) {
+      result = args[0].head().getComplex() / args[1].head().getComplex();
     } else {
       throw SemanticError("Error in call to division: invalid argument.");
     }
   } else {
     throw SemanticError("Error in call to division: invalid number of arguments.");
   }
-  return Expression(result);
+  return complex ? Expression(result) : Expression(result.real());
 };
 
 Expression sqrt(const std::vector<Expression> &args) {
@@ -103,9 +110,10 @@ Expression sqrt(const std::vector<Expression> &args) {
   // check if one argument
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for sqrt");
-  else if (args.at(0).isHeadNumber() && args.at(0).head().asNumber() > 0)
-    return Expression(std::sqrt(args.at(0).head().asNumber()));
-  else
+  else if (args.at(0).isHeadNumber()) {
+    std::complex<double> comp = std::__complex_sqrt(args.at(0).head().getComplex());
+    return comp.imag() == 0 ? Expression(comp.real()) : Expression(comp);
+  } else
     throw SemanticError("Error in call to sqrt, argument not a number");
 };
 

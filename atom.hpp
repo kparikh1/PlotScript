@@ -51,6 +51,9 @@ public:
   /// predicate to determine if an Atom is of type Symbol
   bool isSymbol() const noexcept;
 
+  /// returns if it is complex or a number
+  bool isNumCom() const noexcept;
+
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
 
@@ -59,6 +62,9 @@ public:
 
   /// value of Atom as a complex number, returns 0 if not a Complex
   std::complex<double> asComplex() const noexcept;
+
+  /// Gets the current value of Complex. Does not check type
+  std::complex<double> getComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom &right) const noexcept;
@@ -74,7 +80,6 @@ private:
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)
   union {
-    double numberValue;
     std::string stringValue;
     std::complex<double> complexValue;
   };

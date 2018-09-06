@@ -208,6 +208,15 @@ TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter
   }
 }
 
+TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
+  { // sqrt
+    std::string program = "(sqrt -4)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(std::complex<double>(0, 2)));
+  }
+}
+
 TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]") {
 
   { // exponent
@@ -382,20 +391,20 @@ TEST_CASE("Test using number as procedure", "[interpreter]") {
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
 
-TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
-  std::string input = R"(
-(sqrt -4)
-)";
-
-  Interpreter interp;
-
-  std::istringstream iss(input);
-
-  bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
-
-  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
-}
+//TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
+//  std::string input = R"(
+//(sqrt -4)
+//)";
+//
+//  Interpreter interp;
+//
+//  std::istringstream iss(input);
+//
+//  bool ok = interp.parseStream(iss);
+//  REQUIRE(ok == true);
+//
+//  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+//}
 
 TEST_CASE("Test multiple sqrt arguments", "[interpreter]") {
   std::string input = R"(

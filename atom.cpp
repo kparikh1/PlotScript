@@ -42,7 +42,7 @@ Atom::Atom(const std::string &value) : Atom() {
 
 Atom::Atom(const Atom &x) : Atom() {
   if (x.isNumber()) {
-    setNumber(x.numberValue);
+    setNumber(x.complexValue.real());
   } else if (x.isSymbol()) {
     setSymbol(x.stringValue);
   } else if (x.isComplex()) {
@@ -56,7 +56,7 @@ Atom &Atom::operator=(const Atom &x) {
     if (x.m_type == NoneKind) {
       m_type = NoneKind;
     } else if (x.m_type == NumberKind) {
-      setNumber(x.numberValue);
+      setNumber(x.complexValue.real());
     } else if (x.m_type == SymbolKind) {
       setSymbol(x.stringValue);
     } else if (x.m_type == ComplexKind) {
@@ -87,6 +87,10 @@ bool Atom::isComplex() const noexcept {
   return m_type == ComplexKind;
 }
 
+bool Atom::isNumCom() const noexcept {
+  return isNumber() || isComplex();
+}
+
 bool Atom::isSymbol() const noexcept {
   return m_type == SymbolKind;
 }
@@ -94,7 +98,7 @@ bool Atom::isSymbol() const noexcept {
 void Atom::setNumber(double value) {
 
   m_type = NumberKind;
-  numberValue = value;
+  complexValue = value;
 }
 
 void Atom::setSymbol(const std::string &value) {
@@ -118,7 +122,7 @@ void Atom::setComplex(const std::complex<double> &comp) {
 
 double Atom::asNumber() const noexcept {
 
-  return (m_type == NumberKind) ? numberValue : 0.0;
+  return (m_type == NumberKind) ? complexValue.real() : 0.0;
 }
 
 std::string Atom::asSymbol() const noexcept {
@@ -134,8 +138,11 @@ std::string Atom::asSymbol() const noexcept {
 
 std::complex<double> Atom::asComplex() const noexcept {
 
-  std::complex<double> comp(0.0, 0.0);
-  return isComplex() ? complexValue : comp;
+  return isComplex() ? complexValue : std::complex<double>(0, 0);
+}
+
+std::complex<double> Atom::getComplex() const noexcept {
+  return complexValue;
 }
 
 bool Atom::operator==(const Atom &right) const noexcept {
@@ -151,18 +158,23 @@ bool Atom::operator==(const Atom &right) const noexcept {
   case NumberKind: {
     if (right.m_type != NumberKind)
       return false;
-    double dleft = numberValue;
-    double dright = right.numberValue;
+    double dleft = complexValue.real();
+    double dright = right.complexValue.real();
     double diff = fabs(dleft - dright);
     if (std::isnan(diff) ||
         (diff > std::numeric_limits<double>::epsilon()))
       return false;
   }
     break;
+  case ComplexKind: {
+    if (right.m_type != ComplexKind)
+      return false;
+    return complexValue == right.complexValue;
+  }
+    break;
   case SymbolKind: {
     if (right.m_type != SymbolKind)
       return false;
-
     return stringValue == right.stringValue;
   }
     break;
@@ -186,7 +198,7 @@ std::ostream &operator<<(std::ostream &out, const Atom &a) {
     out << a.asSymbol();
   }
   if (a.isComplex()) {
-    out << a.asComplex();
+    out << a.asComplex().real() << ", " << a.asComplex().imag();
   }
   return out;
 }

@@ -210,19 +210,19 @@ TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter
     std::string program = "(sqrt -256)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<long double>(0., 16.)));
+    REQUIRE(result == Expression(std::complex<double>(0., 16.)));
   }
   {
     std::string program = "(sqrt I)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<long double>(0.707106781186547524, 0.707106781186547524)));
+    REQUIRE(result == Expression(std::complex<double>(0.707106781186547524, 0.707106781186547524)));
   }
   {
     std::string program = "(sqrt (+ 1 I))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<long double>(1.0986841134678099, 0.4550898605622273)));
+    REQUIRE(result == Expression(std::complex<double>(1.0986841134678099, 0.4550898605622273)));
   }
 
 }
@@ -235,26 +235,39 @@ TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]
     Expression result = run(program);
     REQUIRE(result == Expression(256.));
   }
+  { // exponent
+    std::string program = "(^ 6 3)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(216.));
+  }
 
   {
     std::string program = "(^ I 2)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<long double>(-1, 0)));
+    REQUIRE(result == Expression(std::complex<double>(-1, 0)));
   }
   {
     std::string program = "(^ 2 I)";
     INFO(program);
     Expression result = run(program);
     REQUIRE(
-        result == Expression(std::complex<long double>(0.76923890136397212657832999, 0.63896127631363480115003291)));
+        result == Expression(std::complex<double>(0.76923890136397212657832999, 0.63896127631363480115003291)));
   }
   {
     std::string program = "(^ I I)";
     INFO(program);
     Expression result = run(program);
     REQUIRE(
-        result == Expression(std::complex<long double>(0.207879576350761908546955, 0.)));
+        result == Expression(std::complex<double>(0.207879576350761908546955, 0.)));
+  }
+  {
+    std::string program = "(^ e (- (* pi I)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(
+        result == Expression(std::complex<double>(-1., 0.)));
   }
 }
 
@@ -365,7 +378,7 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
                                          "(- -1  I)",
                                          "(* 1 (+ -1 (- I)))",
                                          "(* 1 I I I I (+ -1 (- I)))",};
-    std::complex<long double> comp(-1, -1);
+    std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
       REQUIRE(result == Expression(comp));

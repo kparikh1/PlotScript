@@ -29,7 +29,7 @@ Expression default_proc(const std::vector<Expression> &args) {
 Expression add(const std::vector<Expression> &args) {
 
   // check all arguments are numbers, while adding
-  std::complex<long double> result(0, 0);
+  std::complex<double> result(0, 0);
   bool complex = false;
   for (auto &a :args) {
     if (a.isHeadNumber()) {
@@ -47,7 +47,7 @@ Expression add(const std::vector<Expression> &args) {
 Expression mul(const std::vector<Expression> &args) {
 
   // check all aruments are numbers, while multiplying
-  std::complex<long double> result(1, 0);
+  std::complex<double> result(1, 0);
   bool complex = false;
   for (auto &a :args) {
     if (a.isHeadNumber()) {
@@ -65,7 +65,7 @@ Expression mul(const std::vector<Expression> &args) {
 
 Expression subneg(const std::vector<Expression> &args) {
 
-  std::complex<long double> result;
+  std::complex<double> result;
   bool complex = false;
   // preconditions
   if (nargs_equal(args, 1)) {
@@ -91,7 +91,7 @@ Expression subneg(const std::vector<Expression> &args) {
 
 Expression div(const std::vector<Expression> &args) {
 
-  std::complex<long double> result;
+  std::complex<double> result;
   bool complex = args[0].isHeadComplex() || args[1].isHeadComplex();
   if (nargs_equal(args, 2)) {
     if (args[0].isHeadNumCom() && args[1].isHeadNumCom()) {
@@ -106,13 +106,12 @@ Expression div(const std::vector<Expression> &args) {
 };
 
 Expression sqrt(const std::vector<Expression> &args) {
-
-  double result = 0;
+  
   // check if one argument
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for sqrt");
   else if (args.at(0).isHeadNumCom()) {
-    std::complex<long double> comp = std::sqrt(args.at(0).head().getComplex());
+    std::complex<double> comp = std::sqrt(args.at(0).head().getComplex());
     return comp.imag() == 0 ? Expression(comp.real()) : Expression(comp);
   } else
     throw SemanticError("Error in call to sqrt, argument not a number");
@@ -124,7 +123,7 @@ Expression pow(const std::vector<Expression> &args) {
   if (args.size() != 2)
     throw SemanticError("Error: invalid number of arguments for exponential");
   else if (args.at(0).isHeadNumCom() && args.at(1).isHeadNumCom()) {
-    std::complex<long double> comp = std::pow(args.at(0).head().getComplex(), args.at(1).head().getComplex());
+    std::complex<double> comp = std::pow(args.at(0).head().getComplex(), args.at(1).head().getComplex());
     return (args.at(0).isHeadComplex() || args.at(1).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
   } else
     throw SemanticError("Error in call to exponent, argument not a number");
@@ -135,7 +134,7 @@ Expression ln(const std::vector<Expression> &args) {
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for natural log");
   else if (args.at(0).isHeadNumCom()) {
-    std::complex<long double> comp = std::log(args.at(0).head().getComplex());
+    std::complex<double> comp = std::log(args.at(0).head().getComplex());
     return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
   } else
     throw SemanticError("Error in call to natural log, argument not a number");
@@ -146,7 +145,7 @@ Expression sin(const std::vector<Expression> &args) {
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for sin");
   else if (args.at(0).isHeadNumCom()) {
-    std::complex<long double> comp = std::sin(args.at(0).head().getComplex());
+    std::complex<double> comp = std::sin(args.at(0).head().getComplex());
     return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
   } else
     throw SemanticError("Error in call to sin, argument not a number");
@@ -157,7 +156,7 @@ Expression cos(const std::vector<Expression> &args) {
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for cos");
   else if (args.at(0).isHeadNumCom()) {
-    std::complex<long double> comp = std::cos(args.at(0).head().getComplex());
+    std::complex<double> comp = std::cos(args.at(0).head().getComplex());
     return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
   } else
     throw SemanticError("Error in call to cos, argument not a number");
@@ -168,7 +167,7 @@ Expression tan(const std::vector<Expression> &args) {
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for tan");
   else if (args.at(0).isHeadNumCom()) {
-    std::complex<long double> comp = std::tan(args.at(0).head().getComplex());
+    std::complex<double> comp = std::tan(args.at(0).head().getComplex());
     return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
   } else
     throw SemanticError("Error in call to tan, argument not a number");
@@ -234,10 +233,9 @@ Expression conj(const std::vector<Expression> &args) {
   }
 };
 
-const
-double PI = std::atan2(0, -1);
+const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
-const std::complex<long double> I(0.0, 1.0);
+const std::complex<double> I(0.0, 1.0);
 
 Environment::Environment() {
 

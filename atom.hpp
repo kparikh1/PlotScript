@@ -22,7 +22,7 @@ public:
   Atom(double value);
 
   /// Construct an Atom of type complex with complex number
-  Atom(std::complex<long double> comp);
+  Atom(std::complex<double> comp);
 
   /// Construct an Atom of type Symbol named value
   Atom(const std::string &value);
@@ -61,10 +61,10 @@ public:
   std::string asSymbol() const noexcept;
 
   /// value of Atom as a complex number, returns 0 if not a Complex
-  std::complex<long double> asComplex() const noexcept;
+  std::complex<double> asComplex() const noexcept;
 
   /// Gets the current value of Complex. Does not check type
-  std::complex<long double> getComplex() const noexcept;
+  std::complex<double> getComplex() const noexcept;
 
   /// equality comparison based on type and value
   bool operator==(const Atom &right) const noexcept;
@@ -81,7 +81,7 @@ private:
   // when setting non POD values (see setSymbol)
   union {
     std::string stringValue;
-    std::complex<long double> complexValue;
+    std::complex<double> complexValue;
   };
 
   // helper to set type and value of Number
@@ -91,7 +91,7 @@ private:
   void setSymbol(const std::string &value);
 
   // helper to set type and value of Complex
-  void setComplex(const std::complex<long double> &comp);
+  void setComplex(const std::complex<double> &comp);
 };
 
 /// inequality comparison for Atom
@@ -102,4 +102,5 @@ std::ostream &operator<<(std::ostream &out, const Atom &a);
 
 /// Checks if values are within an epsilon
 bool Epsilon(const double &dLeft, const double &dRight);
+
 #endif

@@ -197,7 +197,7 @@ std::ostream &operator<<(std::ostream &out, const Atom &a) {
     out << a.asSymbol();
   }
   if (a.isComplex()) {
-    out << a.asComplex().real() << ", " << a.asComplex().imag();
+    out << a.asComplex().real() << "," << a.asComplex().imag();
   }
   return out;
 }

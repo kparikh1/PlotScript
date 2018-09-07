@@ -307,7 +307,7 @@ TEST_CASE("Test a medium-sized expression", "[interpreter]") {
   }
 }
 
-TEST_CASE("Test arithmetic procedures", "[interpreter]") {
+TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ 1 -2)",
@@ -322,6 +322,22 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
     for (auto s : programs) {
       Expression result = run(s);
       REQUIRE(result == Expression(-1.));
+    }
+  }
+}
+
+TEST_CASE("Test arithmetic procedures", "[interpreter]") {
+
+  {
+    std::vector<std::string> programs = {"(+ -1 (- I))",
+                                         "(+ -3 1 1 (- I))",
+                                         "(- -1  I)",
+                                         "(* 1 (+ -1 (- I)))",
+                                         "(* 1 I I I I (+ -1 (- I)))",};
+    std::complex<long double> comp(-1, -1);
+    for (auto s : programs) {
+      Expression result = run(s);
+      REQUIRE(result == Expression(comp));
     }
   }
 }

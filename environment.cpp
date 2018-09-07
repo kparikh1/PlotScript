@@ -48,7 +48,7 @@ Expression add(const std::vector<Expression> &args) {
 Expression mul(const std::vector<Expression> &args) {
 
   // check all aruments are numbers, while multiplying
-  std::complex<long double> result(1, 1);
+  std::complex<long double> result(1, 0);
   bool complex = false;
   for (auto &a :args) {
     if (a.isHeadNumber()) {
@@ -70,14 +70,14 @@ Expression subneg(const std::vector<Expression> &args) {
   bool complex = false;
   // preconditions
   if (nargs_equal(args, 1)) {
-    if (args[0].isHeadNumber()) {
+    if (args[0].isHeadNumCom()) {
       result = -args[0].head().getComplex();
       complex = args[0].isHeadComplex();
     } else {
       throw SemanticError("Error in call to negate: invalid argument.");
     }
   } else if (nargs_equal(args, 2)) {
-    if ((args[0].isHeadNumber()) && (args[1].isHeadNumber())) {
+    if ((args[0].isHeadNumCom()) && (args[1].isHeadNumCom())) {
       result = args[0].head().getComplex() - args[1].head().getComplex();
       complex = args[0].isHeadComplex() || args[1].isHeadComplex();
     } else {
@@ -92,7 +92,7 @@ Expression subneg(const std::vector<Expression> &args) {
 
 Expression div(const std::vector<Expression> &args) {
 
-  std::complex<long double> result(0, 0);
+  std::complex<long double> result;
   bool complex = args[0].isHeadComplex() || args[1].isHeadComplex();
   if (nargs_equal(args, 2)) {
     if (args[0].isHeadNumCom() && args[1].isHeadNumCom()) {

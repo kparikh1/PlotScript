@@ -100,4 +100,6 @@ bool operator!=(const Atom &left, const Atom &right) noexcept;
 /// output stream rendering
 std::ostream &operator<<(std::ostream &out, const Atom &a);
 
+/// Checks if values are within an epsilon
+bool Epsilon(const double &dLeft, const double &dRight);
 #endif

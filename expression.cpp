@@ -165,6 +165,17 @@ Expression Expression::handle_define(Environment &env) {
   return result;
 }
 
+Expression Expression::handle_list(Environment &env) {
+
+  Expression result;
+  for (Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it) {
+    result.m_tail.push_back(it->eval(env));
+  }
+
+  return result;
+
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -180,6 +191,10 @@ Expression Expression::eval(Environment &env) {
     // handle define special-form
   else if (m_head.isSymbol() && m_head.asSymbol() == "define") {
     return handle_define(env);
+  }
+    // handle list special-form
+  else if (m_head.isSymbol() && m_head.asSymbol() == "list") {
+    return handle_list(env);
   }
     // else attempt to treat as procedure
   else {
@@ -198,6 +213,8 @@ std::ostream &operator<<(std::ostream &out, const Expression &exp) {
 
   for (auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
     out << *e;
+    if (e + 1 != exp.tailConstEnd())
+      out << " ";
   }
 
   out << ")";

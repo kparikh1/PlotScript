@@ -106,7 +106,7 @@ Expression div(const std::vector<Expression> &args) {
 };
 
 Expression sqrt(const std::vector<Expression> &args) {
-  
+
   // check if one argument
   if (args.size() != 1)
     throw SemanticError("Error: invalid number of arguments for sqrt");
@@ -324,6 +324,9 @@ void Environment::reset() {
   // Built-In value of I
   envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
 
+  // Built-In value of list;
+  envmap.emplace("list", EnvResult(ExpressionType, Expression(Atom(""))));
+
   // Procedure: add;
   envmap.emplace("+", EnvResult(ProcedureType, add));
 
@@ -368,5 +371,4 @@ void Environment::reset() {
 
   // Procedure: conj;
   envmap.emplace("conj", EnvResult(ProcedureType, conj));
-
 }

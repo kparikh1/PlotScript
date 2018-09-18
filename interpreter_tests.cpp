@@ -19,7 +19,7 @@ Expression run(const std::string &program) {
   if (!ok) {
     std::cerr << "Failed to parse: " << program << std::endl;
   }
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   Expression result;
   REQUIRE_NOTHROW(result = interp.evaluate());
@@ -37,21 +37,21 @@ TEST_CASE("Test Interpreter parser with expected input", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 }
 
 TEST_CASE("Test Interpreter parser with numerical literals", "[interpreter]") {
 
   std::vector<std::string> programs = {"(1)", "(+1)", "(+1e+0)", "(1e-0)"};
 
-  for (auto program : programs) {
+  for (const auto &program : programs) {
     std::istringstream iss(program);
 
     Interpreter interp;
 
     bool ok = interp.parseStream(iss);
 
-    REQUIRE(ok == true);
+    REQUIRE(ok);
   }
 
   {
@@ -61,7 +61,7 @@ TEST_CASE("Test Interpreter parser with numerical literals", "[interpreter]") {
 
     bool ok = interp.parseStream(iss);
 
-    REQUIRE(ok == false);
+    REQUIRE(!ok);
   }
 }
 
@@ -73,7 +73,7 @@ TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
 
     Interpreter interp;
     bool ok = interp.parseStream(iss);
-    REQUIRE(ok == false);
+    REQUIRE(!ok);
   }
 
   {
@@ -82,7 +82,7 @@ TEST_CASE("Test Interpreter parser with truncated input", "[interpreter]") {
 
     Interpreter interp;
     bool ok = interp.parseStream(iss);
-    REQUIRE(ok == false);
+    REQUIRE(!ok);
   }
 }
 
@@ -95,7 +95,7 @@ TEST_CASE("Test Interpreter parser with extra input", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter parser with single non-keyword", "[interpreter]") {
@@ -107,7 +107,7 @@ TEST_CASE("Test Interpreter parser with single non-keyword", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter parser with empty input", "[interpreter]") {
@@ -119,7 +119,7 @@ TEST_CASE("Test Interpreter parser with empty input", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter parser with empty expression", "[interpreter]") {
@@ -131,7 +131,7 @@ TEST_CASE("Test Interpreter parser with empty expression", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter parser with bad number string", "[interpreter]") {
@@ -143,7 +143,7 @@ TEST_CASE("Test Interpreter parser with bad number string", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter parser with incorrect input. Regression Test", "[interpreter]") {
@@ -155,7 +155,7 @@ TEST_CASE("Test Interpreter parser with incorrect input. Regression Test", "[int
 
   bool ok = interp.parseStream(iss);
 
-  REQUIRE(ok == false);
+  REQUIRE(!ok);
 }
 
 TEST_CASE("Test Interpreter result with literal expressions", "[interpreter]") {
@@ -163,13 +163,13 @@ TEST_CASE("Test Interpreter result with literal expressions", "[interpreter]") {
   { // Number
     std::string program = "(4)";
     Expression result = run(program);
-    REQUIRE(result == Expression(4.));
+    REQUIRE(result == Expression(Atom(4.)));
   }
 
   { // Symbol
     std::string program = "(pi)";
     Expression result = run(program);
-    REQUIRE(result == Expression(atan2(0, -1)));
+    REQUIRE(result == Expression(Atom(atan2(0, -1))));
   }
 
 }
@@ -180,21 +180,21 @@ TEST_CASE("Test Interpreter result with simple procedures (add)", "[interpreter]
     std::string program = "(+ 1 2)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(3.));
+    REQUIRE(result == Expression(Atom(3.)));
   }
 
   { // add, 3-ary case
     std::string program = "(+ 1 2 3)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(6.));
+    REQUIRE(result == Expression(Atom(6.)));
   }
 
   { // add, 6-ary case
     std::string program = "(+ 1 2 3 4 5 6)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(21.));
+    REQUIRE(result == Expression(Atom(21.)));
   }
 }
 
@@ -204,25 +204,25 @@ TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter
     std::string program = "(sqrt 4)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(2.));
+    REQUIRE(result == Expression(Atom(2.)));
   }
   {
     std::string program = "(sqrt -256)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<double>(0., 16.)));
+    REQUIRE(result == Expression(Atom(std::complex<double>(0., 16.))));
   }
   {
     std::string program = "(sqrt I)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<double>(0.707106781186547524, 0.707106781186547524)));
+    REQUIRE(result == Expression(Atom(std::complex<double>(0.707106781186547524, 0.707106781186547524))));
   }
   {
     std::string program = "(sqrt (+ 1 I))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<double>(1.0986841134678099, 0.4550898605622273)));
+    REQUIRE(result == Expression(Atom(std::complex<double>(1.0986841134678099, 0.4550898605622273))));
   }
 
 }
@@ -233,41 +233,41 @@ TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]
     std::string program = "(^ 4 4)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(256.));
+    REQUIRE(result == Expression(Atom(256.)));
   }
   { // exponent
     std::string program = "(^ 6 3)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(216.));
+    REQUIRE(result == Expression(Atom(216.)));
   }
 
   {
     std::string program = "(^ I 2)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(std::complex<double>(-1, 0)));
+    REQUIRE(result == Expression(Atom(std::complex<double>(-1, 0))));
   }
   {
     std::string program = "(^ 2 I)";
     INFO(program);
     Expression result = run(program);
     REQUIRE(
-        result == Expression(std::complex<double>(0.76923890136397212657832999, 0.63896127631363480115003291)));
+        result == Expression(Atom(std::complex<double>(0.76923890136397212657832999, 0.63896127631363480115003291))));
   }
   {
     std::string program = "(^ I I)";
     INFO(program);
     Expression result = run(program);
     REQUIRE(
-        result == Expression(std::complex<double>(0.207879576350761908546955, 0.)));
+        result == Expression(Atom(std::complex<double>(0.207879576350761908546955, 0.))));
   }
   {
     std::string program = "(^ e (- (* pi I)))";
     INFO(program);
     Expression result = run(program);
     REQUIRE(
-        result == Expression(std::complex<double>(-1., 0.)));
+        result == Expression(Atom(std::complex<double>(-1., 0.))));
   }
 }
 
@@ -277,7 +277,7 @@ TEST_CASE("Test Interpreter result with simple procedures (ln)", "[interpreter]"
     std::string program = "(ln e)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(1.));
+    REQUIRE(result == Expression(Atom(1.)));
   }
 }
 
@@ -287,7 +287,7 @@ TEST_CASE("Test Interpreter result with simple procedures (sin)", "[interpreter]
     std::string program = "(sin (/ pi 2))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(1.));
+    REQUIRE(result == Expression(Atom(1.)));
   }
 }
 
@@ -297,7 +297,7 @@ TEST_CASE("Test Interpreter result with simple procedures (cos)", "[interpreter]
     std::string program = "(cos (/ pi 2))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(0.));
+    REQUIRE(result == Expression(Atom(0.)));
   }
 }
 
@@ -307,7 +307,7 @@ TEST_CASE("Test Interpreter result with simple procedures (tan)", "[interpreter]
     std::string program = "(tan 0)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(0.));
+    REQUIRE(result == Expression(Atom(0.)));
   }
 }
 
@@ -367,28 +367,28 @@ TEST_CASE("Test Interpreter special forms: begin and define", "[interpreter]") {
     std::string program = "(define answer 42)";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(42.));
+    REQUIRE(result == Expression(Atom(42.)));
   }
 
   {
     std::string program = "(begin (define answer 42)\n(answer))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(42.));
+    REQUIRE(result == Expression(Atom(42.)));
   }
 
   {
     std::string program = "(begin (define answer (+ 9 11)) (answer))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(20.));
+    REQUIRE(result == Expression(Atom(20.)));
   }
 
   {
     std::string program = "(begin (define a 1) (define b 1) (+ a b))";
     INFO(program);
     Expression result = run(program);
-    REQUIRE(result == Expression(2.));
+    REQUIRE(result == Expression(Atom(2.)));
   }
 }
 
@@ -397,7 +397,7 @@ TEST_CASE("Test a medium-sized expression", "[interpreter]") {
   {
     std::string program = "(+ (+ 10 1) (+ 30 (+ 1 1)))";
     Expression result = run(program);
-    REQUIRE(result == Expression(43.));
+    REQUIRE(result == Expression(Atom(43.)));
   }
 }
 
@@ -415,7 +415,7 @@ TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
     for (auto s : programs) {
       Expression result = run(s);
-      REQUIRE(result == Expression(-1.));
+      REQUIRE(result == Expression(Atom(-1.)));
     }
   }
 }
@@ -431,7 +431,7 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
     std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
-      REQUIRE(result == Expression(comp));
+      REQUIRE(result == Expression(Atom(comp)));
     }
   }
 }
@@ -448,7 +448,7 @@ TEST_CASE("Test some semantically invalid expresions", "[interpreter]") {
     std::istringstream iss(s);
 
     bool ok = interp.parseStream(iss);
-    REQUIRE(ok == true);
+    REQUIRE(ok);
 
     REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
@@ -465,7 +465,7 @@ TEST_CASE("Test for exceptions from semantically incorrect input", "[interpreter
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -481,7 +481,7 @@ TEST_CASE("Test malformed define", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -496,7 +496,7 @@ TEST_CASE("Test using number as procedure", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -526,7 +526,7 @@ TEST_CASE("Test multiple sqrt arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -541,7 +541,7 @@ TEST_CASE("Test multiple exponent arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -556,7 +556,7 @@ TEST_CASE("Test multiple natural log arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -571,7 +571,7 @@ TEST_CASE("Test multiple sin arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -586,7 +586,7 @@ TEST_CASE("Test multiple cos arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
@@ -601,7 +601,7 @@ TEST_CASE("Test multiple tan arguments", "[interpreter]") {
   std::istringstream iss(input);
 
   bool ok = interp.parseStream(iss);
-  REQUIRE(ok == true);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }

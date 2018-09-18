@@ -25,15 +25,24 @@ public:
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
   /// Default construct and Expression, whose type in NoneType
-  Expression();
+  Expression() = default;
 
   /*! Construct an Expression with given Atom as head an empty tail
     \param atom the atom to make the head
   */
-  Expression(const Atom &a);
+  explicit Expression(const Atom &a);
 
   /// deep-copy construct an expression (recursive)
   Expression(const Expression &a);
+
+  /// Construct Expression with double
+  explicit Expression(const double &value);
+
+  /// Construct Expression with double
+  explicit Expression(const std::string &value);
+
+  /// Construct Expression with complex
+  explicit Expression(const std::complex<double> &value);
 
   /// deep-copy assign an expression  (recursive)
   Expression &operator=(const Expression &a);
@@ -49,6 +58,9 @@ public:
 
   /// return a pointer to the last expression in the tail, or nullptr
   Expression *tail();
+
+  /// return the tail
+  const std::vector<Expression> &getTail() const;
 
   /// return a const-iterator to the beginning of tail
   ConstIteratorType tailConstBegin() const noexcept;

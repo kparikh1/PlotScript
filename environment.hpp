@@ -97,8 +97,8 @@ private:
     Procedure proc; // used when type is ProcedureType
 
     // constructors for use in container emplace
-    EnvResult(){};
-    EnvResult(EnvResultType t, Expression e) : type(t), exp(e){};
+    EnvResult() = default;
+    EnvResult(EnvResultType t, const Expression &e) : type(t), exp(e){};
     EnvResult(EnvResultType t, Procedure p) : type(t), proc(p){};
   };
 

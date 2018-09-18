@@ -19,16 +19,16 @@ public:
   Atom();
 
   /// Construct an Atom of type Number with value
-  Atom(double value);
+  explicit Atom(double value);
 
   /// Construct an Atom of type complex with complex number
-  Atom(std::complex<double> comp);
+  explicit Atom(std::complex<double> comp);
 
   /// Construct an Atom of type Symbol named value
-  Atom(const std::string &value);
+  explicit Atom(const std::string &value);
 
   /// Construct an Atom directly from a Token
-  Atom(const Token &token);
+  explicit Atom(const Token &token);
 
   /// Copy-construct an Atom
   Atom(const Atom &x);

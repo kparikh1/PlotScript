@@ -25,7 +25,7 @@ TEST_CASE("Test default constructor", "[environment]") {
 TEST_CASE("Test get expression", "[environment]") {
   Environment env;
 
-  REQUIRE(env.get_exp(Atom("pi")) == Expression(std::atan2(0, -1)));
+  REQUIRE(env.get_exp(Atom("pi")) == Expression(Atom(std::atan2(0, -1))));
   REQUIRE(env.get_exp(Atom("hi")) == Expression());
 }
 
@@ -62,7 +62,7 @@ TEST_CASE("Test get built-in procedure", "[environment]") {
   Procedure padd = env.get_proc(Atom("+"));
   args.emplace_back(1.0);
   args.emplace_back(2.0);
-  REQUIRE(padd(args) == Expression(3.0));
+  REQUIRE(padd(args) == Expression(Atom(3.0)));
 }
 
 TEST_CASE("Test reset", "[environment]") {

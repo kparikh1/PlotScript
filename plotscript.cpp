@@ -47,7 +47,7 @@ int eval_from_stream(std::istream & stream){
   return EXIT_SUCCESS;
 }
 
-int eval_from_file(std::string filename){
+int eval_from_file(const std::string &filename){
       
   std::ifstream ifs(filename);
   
@@ -59,7 +59,7 @@ int eval_from_file(std::string filename){
   return eval_from_stream(ifs);
 }
 
-int eval_from_command(std::string argexp){
+int eval_from_command(const std::string &argexp){
 
   std::istringstream expression(argexp);
 

@@ -6,8 +6,6 @@
 #include "environment.hpp"
 #include "semantic_error.hpp"
 
-Expression::Expression() {}
-
 Expression::Expression(const Atom &a) {
 
   m_head = a;
@@ -18,8 +16,20 @@ Expression::Expression(const Expression &a) {
 
   m_head = a.m_head;
   for (auto e : a.m_tail) {
-    m_tail.push_back(e);
+    m_tail.emplace_back(e);
   }
+}
+
+Expression::Expression(const double &value) {
+  m_head = Atom(value);
+}
+
+Expression::Expression(const std::string &value)  {
+  m_head = Atom(value);
+}
+
+Expression::Expression(const std::complex<double> &value) {
+  m_head = Atom(value);
 }
 
 Expression &Expression::operator=(const Expression &a) {
@@ -29,7 +39,7 @@ Expression &Expression::operator=(const Expression &a) {
     m_head = a.m_head;
     m_tail.clear();
     for (auto e : a.m_tail) {
-      m_tail.push_back(e);
+      m_tail.emplace_back(e);
     }
   }
 
@@ -67,11 +77,15 @@ void Expression::append(const Atom &a) {
 Expression *Expression::tail() {
   Expression *ptr = nullptr;
 
-  if (m_tail.size() > 0) {
+  if (!m_tail.empty()) {
     ptr = &m_tail.back();
   }
 
   return ptr;
+}
+
+const std::vector<Expression> &Expression::getTail() const {
+  return m_tail;
 }
 
 Expression::ConstIteratorType Expression::tailConstBegin() const noexcept {
@@ -117,14 +131,14 @@ Expression Expression::handle_lookup(const Atom &head, const Environment &env) {
 
 Expression Expression::handle_begin(Environment &env) {
 
-  if (m_tail.size() == 0) {
+  if (m_tail.empty()) {
     throw SemanticError("Error during evaluation: zero arguments to begin");
   }
 
   // evaluate each arg from tail, return the last
   Expression result;
-  for (Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it) {
-    result = it->eval(env);
+  for (auto it:m_tail) {
+    result = it.eval(env);
   }
 
   return result;
@@ -168,8 +182,8 @@ Expression Expression::handle_define(Environment &env) {
 Expression Expression::handle_list(Environment &env) {
 
   Expression result;
-  for (Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it) {
-    result.m_tail.push_back(it->eval(env));
+  for (auto it:m_tail) {
+    result.m_tail.push_back(it.eval(env));
   }
 
   return result;
@@ -199,8 +213,8 @@ Expression Expression::eval(Environment &env) {
     // else attempt to treat as procedure
   else {
     std::vector<Expression> results;
-    for (Expression::IteratorType it = m_tail.begin(); it != m_tail.end(); ++it) {
-      results.push_back(it->eval(env));
+    for (auto it:m_tail) {
+      results.push_back(it.eval(env));
     }
     return apply(m_head, results, env);
   }

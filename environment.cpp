@@ -41,7 +41,7 @@ Expression add(const std::vector<Expression> &args) {
       throw SemanticError("Error in call to add, argument not a number");
     }
   }
-  return complex ? Expression(result) : Expression(result.real());
+  return complex ? Expression(Atom(result)) : Expression(Atom(result.real()));
 };
 
 Expression mul(const std::vector<Expression> &args) {
@@ -60,7 +60,7 @@ Expression mul(const std::vector<Expression> &args) {
     }
   }
 
-  return complex ? Expression(result) : Expression(result.real());
+  return complex ? Expression(Atom(result)) : Expression(Atom(result.real()));
 };
 
 Expression subneg(const std::vector<Expression> &args) {
@@ -86,7 +86,7 @@ Expression subneg(const std::vector<Expression> &args) {
     throw SemanticError("Error in call to subtraction or negation: invalid number of arguments.");
   }
 
-  return complex ? Expression(result) : Expression(result.real());
+  return complex ? Expression(Atom(result)) : Expression(Atom(result.real()));
 };
 
 Expression div(const std::vector<Expression> &args) {
@@ -102,7 +102,7 @@ Expression div(const std::vector<Expression> &args) {
   } else {
     throw SemanticError("Error in call to division: invalid number of arguments.");
   }
-  return complex ? Expression(result) : Expression(result.real());
+  return complex ? Expression(Atom(result)) : Expression(Atom(result.real()));
 };
 
 Expression sqrt(const std::vector<Expression> &args) {
@@ -112,7 +112,7 @@ Expression sqrt(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for sqrt");
   else if (args.at(0).isHeadNumCom()) {
     std::complex<double> comp = std::sqrt(args.at(0).head().getComplex());
-    return comp.imag() == 0 ? Expression(comp.real()) : Expression(comp);
+    return comp.imag() == 0 ? Expression(Atom(comp.real())) : Expression(Atom(comp));
   } else
     throw SemanticError("Error in call to sqrt, argument not a number");
 };
@@ -124,7 +124,8 @@ Expression pow(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for exponential");
   else if (args.at(0).isHeadNumCom() && args.at(1).isHeadNumCom()) {
     std::complex<double> comp = std::pow(args.at(0).head().getComplex(), args.at(1).head().getComplex());
-    return (args.at(0).isHeadComplex() || args.at(1).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
+    return (args.at(0).isHeadComplex() || args.at(1).isHeadComplex()) ? Expression(Atom(comp))
+                                                                      : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to exponent, argument not a number");
 };
@@ -135,7 +136,7 @@ Expression ln(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for natural log");
   else if (args.at(0).isHeadNumCom()) {
     std::complex<double> comp = std::log(args.at(0).head().getComplex());
-    return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
+    return (args.at(0).isHeadComplex()) ? Expression(Atom(comp)) : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to natural log, argument not a number");
 };
@@ -146,7 +147,7 @@ Expression sin(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for sin");
   else if (args.at(0).isHeadNumCom()) {
     std::complex<double> comp = std::sin(args.at(0).head().getComplex());
-    return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
+    return (args.at(0).isHeadComplex()) ? Expression(Atom(comp)) : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to sin, argument not a number");
 };
@@ -157,7 +158,7 @@ Expression cos(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for cos");
   else if (args.at(0).isHeadNumCom()) {
     std::complex<double> comp = std::cos(args.at(0).head().getComplex());
-    return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
+    return (args.at(0).isHeadComplex()) ? Expression(Atom(comp)) : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to cos, argument not a number");
 };
@@ -168,7 +169,7 @@ Expression tan(const std::vector<Expression> &args) {
     throw SemanticError("Error: invalid number of arguments for tan");
   else if (args.at(0).isHeadNumCom()) {
     std::complex<double> comp = std::tan(args.at(0).head().getComplex());
-    return (args.at(0).isHeadComplex()) ? Expression(comp) : Expression(comp.real());
+    return (args.at(0).isHeadComplex()) ? Expression(Atom(comp)) : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to tan, argument not a number");
 };
@@ -176,7 +177,7 @@ Expression tan(const std::vector<Expression> &args) {
 Expression real(const std::vector<Expression> &args) {
   if (nargs_equal(args, 1)) {
     if (args.at(0).isHeadComplex()) {
-      return Expression(args.at(0).head().getComplex().real());
+      return Expression(Atom(args.at(0).head().getComplex().real()));
     } else {
       throw SemanticError("Error in call to real: Not a Complex.");
     }
@@ -188,7 +189,7 @@ Expression real(const std::vector<Expression> &args) {
 Expression imag(const std::vector<Expression> &args) {
   if (nargs_equal(args, 1)) {
     if (args.at(0).isHeadComplex()) {
-      return Expression(args.at(0).head().getComplex().imag());
+      return Expression(Atom(args.at(0).head().getComplex().imag()));
     } else {
       throw SemanticError("Error in call to imag: Not a Complex.");
     }
@@ -200,7 +201,7 @@ Expression imag(const std::vector<Expression> &args) {
 Expression mag(const std::vector<Expression> &args) {
   if (nargs_equal(args, 1)) {
     if (args.at(0).isHeadComplex()) {
-      return Expression(std::abs(args.at(0).head().getComplex()));
+      return Expression(Atom(std::abs(args.at(0).head().getComplex())));
     } else {
       throw SemanticError("Error in call to mag: Not a Complex.");
     }
@@ -212,7 +213,7 @@ Expression mag(const std::vector<Expression> &args) {
 Expression arg(const std::vector<Expression> &args) {
   if (nargs_equal(args, 1)) {
     if (args.at(0).isHeadComplex()) {
-      return Expression(std::arg(args.at(0).head().getComplex()));
+      return Expression(Atom(std::arg(args.at(0).head().getComplex())));
     } else {
       throw SemanticError("Error in call to arg: Not a Complex.");
     }
@@ -224,12 +225,26 @@ Expression arg(const std::vector<Expression> &args) {
 Expression conj(const std::vector<Expression> &args) {
   if (nargs_equal(args, 1)) {
     if (args.at(0).isHeadComplex()) {
-      return Expression(std::conj(args.at(0).head().getComplex()));
+      return Expression(Atom(std::conj(args.at(0).head().getComplex())));
     } else {
       throw SemanticError("Error in call to arg: Not a Complex.");
     }
   } else {
     throw SemanticError("Error in call to arg: invalid number of arguments.");
+  }
+};
+
+Expression first(const std::vector<Expression> &args) {
+  if (nargs_equal(args, 1)) {
+    if (args.at(0).head().isSymbol() && args.at(0).head().asSymbol().empty()) {
+      throw SemanticError("Error: argument to first is an empty list");
+    } else if (args.at(0).isHeadNumCom()) {
+      throw SemanticError("Error: argument to first is not a list");
+    } else {
+      return args.at(0).getTail().at(0);
+    }
+  } else {
+    throw SemanticError("Error: more than one argument in call to first");
   }
 };
 
@@ -316,13 +331,13 @@ void Environment::reset() {
   envmap.clear();
 
   // Built-In value of pi
-  envmap.emplace("pi", EnvResult(ExpressionType, Expression(PI)));
+  envmap.emplace("pi", EnvResult(ExpressionType, Expression(Atom(PI))));
 
   // Built-In value of e
-  envmap.emplace("e", EnvResult(ExpressionType, Expression(EXP)));
+  envmap.emplace("e", EnvResult(ExpressionType, Expression(Atom(EXP))));
 
   // Built-In value of I
-  envmap.emplace("I", EnvResult(ExpressionType, Expression(I)));
+  envmap.emplace("I", EnvResult(ExpressionType, Expression(Atom(I))));
 
   // Built-In value of list;
   envmap.emplace("list", EnvResult(ExpressionType, Expression(Atom(""))));
@@ -371,4 +386,7 @@ void Environment::reset() {
 
   // Procedure: conj;
   envmap.emplace("conj", EnvResult(ProcedureType, conj));
+
+  // Procedure: first;
+  envmap.emplace("first", EnvResult(ProcedureType, first));
 }

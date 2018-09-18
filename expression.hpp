@@ -62,6 +62,9 @@ public:
   /// return the tail
   const std::vector<Expression> &getTail() const;
 
+  /// return the tail
+  std::vector<Expression> &getTail();
+
   /// return a const-iterator to the beginning of tail
   ConstIteratorType tailConstBegin() const noexcept;
 

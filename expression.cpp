@@ -24,7 +24,7 @@ Expression::Expression(const double &value) {
   m_head = Atom(value);
 }
 
-Expression::Expression(const std::string &value)  {
+Expression::Expression(const std::string &value) {
   m_head = Atom(value);
 }
 
@@ -85,6 +85,10 @@ Expression *Expression::tail() {
 }
 
 const std::vector<Expression> &Expression::getTail() const {
+  return m_tail;
+}
+
+std::vector<Expression> &Expression::getTail() {
   return m_tail;
 }
 

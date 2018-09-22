@@ -2,7 +2,7 @@
 
 #include "atom.hpp"
 
-TEST_CASE( "Test constructors", "[atom]" ) {
+TEST_CASE("Test constructors", "[atom]") {
 
   {
     INFO("Default Constructor");
@@ -11,6 +11,7 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(a.isNone());
     REQUIRE(!a.isNumber());
     REQUIRE(!a.isSymbol());
+    REQUIRE(!a.isComplex());
   }
 
   {
@@ -20,6 +21,17 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNone());
     REQUIRE(a.isNumber());
     REQUIRE(!a.isSymbol());
+    REQUIRE(!a.isComplex());
+  }
+
+  {
+    INFO("Complex Constructor");
+    Atom a(std::complex<double>(1, 1));
+
+    REQUIRE(!a.isNone());
+    REQUIRE(!a.isNumber());
+    REQUIRE(!a.isSymbol());
+    REQUIRE(a.isComplex());
   }
 
   {
@@ -29,8 +41,8 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNone());
     REQUIRE(!a.isNumber());
     REQUIRE(a.isSymbol());
+    REQUIRE(!a.isComplex());
   }
-
 
   {
     INFO("Token Constructor");
@@ -40,13 +52,15 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNone());
     REQUIRE(!a.isNumber());
     REQUIRE(a.isSymbol());
+    REQUIRE(!a.isComplex());
   }
 
   {
     INFO("Copy Constructor");
     Atom a("hi");
     Atom b(1.0);
-    
+    Atom e(std::complex<double>(1, 1));
+
     Atom c = a;
     REQUIRE(!a.isNone());
     REQUIRE(!c.isNumber());
@@ -56,10 +70,16 @@ TEST_CASE( "Test constructors", "[atom]" ) {
     REQUIRE(!a.isNone());
     REQUIRE(d.isNumber());
     REQUIRE(!d.isSymbol());
+
+    Atom f = e;
+    REQUIRE(!e.isNone());
+    REQUIRE(!f.isNumber());
+    REQUIRE(!f.isSymbol());
+    REQUIRE(f.isComplex());
   }
 }
 
-TEST_CASE( "Test assignment", "[atom]" ) {
+TEST_CASE("Test assignment", "[atom]") {
 
   {
     INFO("default to default");
@@ -144,9 +164,40 @@ TEST_CASE( "Test assignment", "[atom]" ) {
     REQUIRE(b.isSymbol());
     REQUIRE(b.asSymbol() == "hi");
   }
+  {
+    INFO("symbol to complex");
+    Atom a("hi");
+    Atom b(std::complex<double>(0, 1));
+    b = a;
+    REQUIRE(b.isSymbol());
+    REQUIRE(b.asSymbol() == "hi");
+  }
+  {
+    INFO("complex to complex");
+    Atom a(std::complex<double>(1, 0));
+    Atom b(std::complex<double>(0, 1));
+    b = a;
+    REQUIRE(b.isComplex());
+    REQUIRE(b.asComplex() == std::complex<double>(1, 0));
+  }
+  {
+    INFO("complex to number");
+    Atom a(1.);
+    Atom b(std::complex<double>(0, 1));
+    b = a;
+    REQUIRE(b.isNumber());
+    REQUIRE(b.asNumber() == 1.);
+  }
+  {
+    INFO("complex to defualt");
+    Atom a;
+    Atom b(std::complex<double>(0, 1));
+    b = a;
+    REQUIRE(b.isNone());
+  }
 }
 
-TEST_CASE( "test comparison", "[atom]" ) {
+TEST_CASE("test comparison", "[atom]") {
 
   {
     INFO("compare default to default");
@@ -214,10 +265,24 @@ TEST_CASE( "test comparison", "[atom]" ) {
     REQUIRE(a == b);
     REQUIRE(a != c);
   }
-
+  {
+    INFO("compare complex to symbol");
+    Atom a("hi");
+    Atom b(std::complex<double>(1, 0));
+    REQUIRE(a != b);
+  }
+  {
+    INFO("compare complex to number");
+    Atom a(1.);
+    Atom b(std::complex<double>(1, 0));
+    REQUIRE(a != b);
+  }
+  {
+    INFO("compare complex to complex");
+    Atom a(std::complex<double>(1, 1));
+    Atom b(std::complex<double>(0, 1));
+    Atom c(std::complex<double>(0, 1));
+    REQUIRE(a != b);
+    REQUIRE(b == c);
+  }
 }
-
-
-
-
-

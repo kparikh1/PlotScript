@@ -311,6 +311,56 @@ TEST_CASE("Test Interpreter result with simple procedures (tan)", "[interpreter]
   }
 }
 
+TEST_CASE("Test Interpreter result with simple procedures (real)", "[interpreter]") {
+
+  { // real
+    std::string program = "(real (+ 1 I))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (imag)", "[interpreter]") {
+
+  { // imag
+    std::string program = "(imag (+ 1 (* 2 I)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(2.));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (mag)", "[interpreter]") {
+
+  { // mag
+    std::string program = "(mag (+ 1 (* 2 I)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(2.23606797749979));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (arg)", "[interpreter]") {
+
+  { // arg
+    std::string program = "(arg (+ 1 (* 2 I)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1.10714871779409));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (conj)", "[interpreter]") {
+
+  { // conj
+    std::string program = "(conj (+ 1 (* 2 I)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(std::complex<double>(1, -2)));
+  }
+}
+
 TEST_CASE("Test Interpreter special forms: begin and define", "[interpreter]") {
 
   {
@@ -451,20 +501,20 @@ TEST_CASE("Test using number as procedure", "[interpreter]") {
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
 
-//TEST_CASE("Test negative sqrt procedure", "[interpreter]") {
-//  std::string input = R"(
-//(sqrt -4)
-//)";
-//
-//  Interpreter interp;
-//
-//  std::istringstream iss(input);
-//
-//  bool ok = interp.parseStream(iss);
-//  REQUIRE(ok == true);
-//
-//  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
-//}
+TEST_CASE("Test multiple div arguments", "[interpreter]") {
+  std::string input = R"(
+(div (+ 1 2 3))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
 
 TEST_CASE("Test multiple sqrt arguments", "[interpreter]") {
   std::string input = R"(
@@ -552,6 +602,156 @@ TEST_CASE("Test multiple tan arguments", "[interpreter]") {
 
   bool ok = interp.parseStream(iss);
   REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple real arguments", "[interpreter]") {
+  std::string input = R"(
+(real (+ 1 I) 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple imag arguments", "[interpreter]") {
+  std::string input = R"(
+(imag (+ 1 I) 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple mag arguments", "[interpreter]") {
+  std::string input = R"(
+(mag (+ 1 I) 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple arg arguments", "[interpreter]") {
+  std::string input = R"(
+(arg (+ 1 I) 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok == true);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple conj arguments", "[interpreter]") {
+  std::string input = R"(
+(conj (+ 1 I) (- 1 I))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid real arguments", "[interpreter]") {
+  std::string input = R"(
+(real 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid imag arguments", "[interpreter]") {
+  std::string input = R"(
+(imag 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid mag arguments", "[interpreter]") {
+  std::string input = R"(
+(mag 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid arg arguments", "[interpreter]") {
+  std::string input = R"(
+(arg 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid conj arguments", "[interpreter]") {
+  std::string input = R"(
+(conj 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }

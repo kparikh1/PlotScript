@@ -2,7 +2,7 @@
 
 #include "expression.hpp"
 
-TEST_CASE( "Test default expression", "[expression]" ) {
+TEST_CASE("Test default expression", "[expression]") {
 
   Expression exp;
 
@@ -10,7 +10,7 @@ TEST_CASE( "Test default expression", "[expression]" ) {
   REQUIRE(!exp.isHeadSymbol());
 }
 
-TEST_CASE( "Test double expression", "[expression]" ) {
+TEST_CASE("Test double expression", "[expression]") {
 
   Expression exp(6.023);
 
@@ -18,8 +18,7 @@ TEST_CASE( "Test double expression", "[expression]" ) {
   REQUIRE(!exp.isHeadSymbol());
 }
 
-
-TEST_CASE( "Test symbol expression", "[expression]" ) {
+TEST_CASE("Test symbol expression", "[expression]") {
 
   Expression exp(Atom("asymbol"));
 
@@ -27,3 +26,12 @@ TEST_CASE( "Test symbol expression", "[expression]" ) {
   REQUIRE(exp.isHeadSymbol());
 }
 
+TEST_CASE("Test complex expression", "[expression]") {
+
+  Expression exp(std::complex<double>(1, 1));
+
+  REQUIRE(exp.isHeadNumCom());
+  REQUIRE(!exp.isHeadNumber());
+  REQUIRE(!exp.isHeadSymbol());
+  REQUIRE(exp.isHeadComplex());
+}

@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-TEST_CASE( "Test default constructor", "[environment]" ) {
+TEST_CASE("Test default constructor", "[environment]") {
 
   Environment env;
 
@@ -22,14 +22,14 @@ TEST_CASE( "Test default constructor", "[environment]" ) {
   REQUIRE(!env.is_proc(Atom("op")));
 }
 
-TEST_CASE( "Test get expression", "[environment]" ) {
+TEST_CASE("Test get expression", "[environment]") {
   Environment env;
 
   REQUIRE(env.get_exp(Atom("pi")) == Expression(std::atan2(0, -1)));
   REQUIRE(env.get_exp(Atom("hi")) == Expression());
 }
 
-TEST_CASE( "Test add expression", "[environment]" ) {
+TEST_CASE("Test add expression", "[environment]") {
   Environment env;
 
   Expression a(Atom(1.0));
@@ -47,7 +47,7 @@ TEST_CASE( "Test add expression", "[environment]" ) {
   REQUIRE_THROWS_AS(env.add_exp(Atom(1.0), b), SemanticError);
 }
 
-TEST_CASE( "Test get built-in procedure", "[environment]" ) {
+TEST_CASE("Test get built-in procedure", "[environment]") {
   Environment env;
 
   INFO("default procedure")
@@ -65,7 +65,7 @@ TEST_CASE( "Test get built-in procedure", "[environment]" ) {
   REQUIRE(padd(args) == Expression(3.0));
 }
 
-TEST_CASE( "Test reset", "[environment]" ) {
+TEST_CASE("Test reset", "[environment]") {
   Environment env;
 
   Expression a(Atom(1.0));
@@ -82,13 +82,13 @@ TEST_CASE( "Test reset", "[environment]" ) {
   REQUIRE(env.get_exp(Atom("hi")) == Expression());
 }
 
-TEST_CASE( "Test semeantic errors", "[environment]" ) {
+TEST_CASE("Test semeantic errors", "[environment]") {
 
   Environment env;
 
   {
     Expression exp(Atom("begin"));
-    
+
     REQUIRE_THROWS_AS(exp.eval(env), SemanticError);
   }
 }

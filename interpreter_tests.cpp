@@ -172,6 +172,12 @@ TEST_CASE("Test Interpreter result with literal expressions", "[interpreter]") {
     REQUIRE(result == Expression(Atom(atan2(0, -1))));
   }
 
+  { // Empty List
+    std::string program = "(list)";
+    Expression result = run(program);
+    REQUIRE(result == Expression(""));
+  }
+
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (add)", "[interpreter]") {
@@ -361,7 +367,77 @@ TEST_CASE("Test Interpreter result with simple procedures (conj)", "[interpreter
   }
 }
 
-TEST_CASE("Test Interpreter special forms: begin and define", "[interpreter]") {
+TEST_CASE("Test Interpreter result with simple procedures (first)", "[interpreter]") {
+
+  { // first
+    std::string program = "(first (list 1 2 3))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (rest)", "[interpreter]") {
+
+  { // rest
+    std::string program = "(rest (list 1 2 3))";
+    INFO(program);
+    Expression result = run(program);
+    Expression exp;
+    exp.getTail().emplace_back(Expression(2));
+    exp.getTail().emplace_back(Expression(3));
+    REQUIRE(result == exp);
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (length)", "[interpreter]") {
+
+  { // length
+    std::string program = "(length (list 1 2 3))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(3));
+
+    program = "(length (list))";
+    INFO(program);
+    result = run(program);
+    REQUIRE(result == Expression(0));
+  }
+}
+
+TEST_CASE("Test Interpreter result with simple procedures (append)", "[interpreter]") {
+
+  { // append
+    std::string program = "(append (list 1 2 3))";
+    INFO(program);
+    Expression result = run(program);
+    Expression exp;
+    exp.getTail().emplace_back(Expression(1));
+    exp.getTail().emplace_back(Expression(2));
+    exp.getTail().emplace_back(Expression(3));
+    REQUIRE(result == exp);
+
+    program = "(append (list))";
+    INFO(program);
+    result = run(program);
+    REQUIRE(result == Expression(""));
+
+    program = "(append (list 1 2 3) 4 5 6)";
+    INFO(program);
+    result = run(program);
+    exp.getTail().clear();
+    exp.getTail().emplace_back(Expression(1));
+    exp.getTail().emplace_back(Expression(2));
+    exp.getTail().emplace_back(Expression(3));
+    exp.getTail().emplace_back(Expression(4));
+    exp.getTail().emplace_back(Expression(5));
+    exp.getTail().emplace_back(Expression(6));
+    REQUIRE(result == exp);
+
+  }
+}
+
+TEST_CASE("Test Interpreter special forms: begin and define and list", "[interpreter]") {
 
   {
     std::string program = "(define answer 42)";
@@ -389,6 +465,18 @@ TEST_CASE("Test Interpreter special forms: begin and define", "[interpreter]") {
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(2.)));
+  }
+
+  {
+    std::string program = "(list 1 2 3 4)";
+    INFO(program);
+    Expression result = run(program);
+    Expression exp;
+    exp.getTail().emplace_back(Expression(1));
+    exp.getTail().emplace_back(Expression(2));
+    exp.getTail().emplace_back(Expression(3));
+    exp.getTail().emplace_back(Expression(4));
+    REQUIRE(result == exp);
   }
 }
 
@@ -681,6 +769,81 @@ TEST_CASE("Test multiple conj arguments", "[interpreter]") {
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
 
+TEST_CASE("Test multiple first arguments", "[interpreter]") {
+  std::string input = R"(
+(first (list 1 2 3) (list 1 2 3))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple rest arguments", "[interpreter]") {
+  std::string input = R"(
+(rest (list 1 2 3) (list 1 2 3))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple length arguments", "[interpreter]") {
+  std::string input = R"(
+(length (list 1 2 3) (list 1 2 3))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test empty argument to first", "[interpreter]") {
+  std::string input = R"(
+(first (list))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test empty argument to rest", "[interpreter]") {
+  std::string input = R"(
+(rest (list))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
 TEST_CASE("Test invalid real arguments", "[interpreter]") {
   std::string input = R"(
 (real 1)
@@ -744,6 +907,66 @@ TEST_CASE("Test invalid arg arguments", "[interpreter]") {
 TEST_CASE("Test invalid conj arguments", "[interpreter]") {
   std::string input = R"(
 (conj 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid first arguments", "[interpreter]") {
+  std::string input = R"(
+(first 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid rest arguments", "[interpreter]") {
+  std::string input = R"(
+(rest 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid length arguments", "[interpreter]") {
+  std::string input = R"(
+(length 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid append arguments", "[interpreter]") {
+  std::string input = R"(
+(append 1 (list 1 3 4))
 )";
 
   Interpreter interp;

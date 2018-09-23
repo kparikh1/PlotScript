@@ -20,7 +20,7 @@ TEST_CASE("Test double expression", "[expression]") {
 
 TEST_CASE("Test symbol expression", "[expression]") {
 
-  Expression exp(Atom("asymbol"));
+  Expression exp("asymbol");
 
   REQUIRE(!exp.isHeadNumber());
   REQUIRE(exp.isHeadSymbol());

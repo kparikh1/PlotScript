@@ -83,6 +83,9 @@ public:
   /// convienience number to determine if head atom is a number or complex
   bool isHeadNumCom() const noexcept;
 
+  /// convienience member to determine if the expression is a list type
+  bool isList() const noexcept;
+
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment &env);
 

@@ -262,7 +262,30 @@ Expression rest(const std::vector<Expression> &args) {
       return exp;
     }
   } else {
-    throw SemanticError("Error: more than one argument in call to first");
+    throw SemanticError("Error: more than one argument in call to rest");
+  }
+};
+
+Expression length(const std::vector<Expression> &args) {
+  if (nargs_equal(args, 1)) {
+    if (args.cbegin()->isHeadNumCom()) {
+      throw SemanticError("Error: argument to first is not a list");
+    } else {
+      return Expression(args.cbegin()->getTail().size());
+    }
+  } else {
+    throw SemanticError("Error: more than one argument in call to length");
+  }
+};
+
+Expression append(const std::vector<Expression> &args) {
+  if (!args.cbegin()->isList()) {
+    throw SemanticError("Error: First argument not list in append");
+  } else {
+    Expression value = *args.cbegin();
+    for (auto it = args.cbegin() + 1; it != args.cend(); ++it)
+      value.getTail().push_back(*it);
+    return value;
   }
 };
 
@@ -292,7 +315,8 @@ bool Environment::is_exp(const Atom &sym) const {
 
 Expression Environment::get_exp(const Atom &sym) const {
 
-  Expression exp;
+  Expression
+      exp;
 
   if (sym.isSymbol()) {
     auto result = envmap.find(sym.asSymbol());
@@ -410,4 +434,10 @@ void Environment::reset() {
 
   // Procedure: rest;
   envmap.emplace("rest", EnvResult(ProcedureType, rest));
+
+  // Procedure: length;
+  envmap.emplace("length", EnvResult(ProcedureType, length));
+
+  // Procedure: append;
+  envmap.emplace("append", EnvResult(ProcedureType, append));
 }

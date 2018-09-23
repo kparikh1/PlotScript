@@ -70,6 +70,10 @@ bool Expression::isHeadNumCom() const noexcept {
   return m_head.isNumCom();
 }
 
+bool Expression::isList() const noexcept {
+  return (m_head.isSymbol() && m_head.asSymbol().empty()) || !m_tail.empty();
+}
+
 void Expression::append(const Atom &a) {
   m_tail.emplace_back(a);
 }

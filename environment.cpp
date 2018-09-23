@@ -289,6 +289,18 @@ Expression append(const std::vector<Expression> &args) {
   }
 };
 
+Expression join(const std::vector<Expression> &args) {
+  Expression result = *args.cbegin();
+  for (auto arg = args.cbegin() + 1; arg != args.cend(); ++arg) {
+    if (!arg->isList())
+      throw SemanticError("Error: Argument to join is not a list");
+    for (auto value:arg->getTail()) {
+      result.getTail().emplace_back(value);
+    }
+  }
+  return result;
+}
+
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
 const std::complex<double> I(0.0, 1.0);
@@ -440,4 +452,7 @@ void Environment::reset() {
 
   // Procedure: append;
   envmap.emplace("append", EnvResult(ProcedureType, append));
+
+  // Procedure: join;
+  envmap.emplace("join", EnvResult(ProcedureType, join));
 }

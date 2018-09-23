@@ -437,6 +437,34 @@ TEST_CASE("Test Interpreter result with simple procedures (append)", "[interpret
   }
 }
 
+TEST_CASE("Test Interpreter result with simple procedures (join)", "[interpreter]") {
+  // join
+  std::string program = "(join (list 1 2 3) (list 4 5 6))";
+  INFO(program);
+  Expression result = run(program);
+  Expression exp;
+  exp.getTail().emplace_back(Expression(1));
+  exp.getTail().emplace_back(Expression(2));
+  exp.getTail().emplace_back(Expression(3));
+  exp.getTail().emplace_back(Expression(4));
+  exp.getTail().emplace_back(Expression(5));
+  exp.getTail().emplace_back(Expression(6));
+  REQUIRE(result == exp);
+
+  program = "(join (list 1 2 3) (list 4 5 6) (list (+ 2 I)))";
+  INFO(program);
+  result = run(program);
+  exp.getTail().clear();
+  exp.getTail().emplace_back(Expression(1));
+  exp.getTail().emplace_back(Expression(2));
+  exp.getTail().emplace_back(Expression(3));
+  exp.getTail().emplace_back(Expression(4));
+  exp.getTail().emplace_back(Expression(5));
+  exp.getTail().emplace_back(Expression(6));
+  exp.getTail().emplace_back(Expression(std::complex<double>(2, 1)));
+  REQUIRE(result == exp);
+}
+
 TEST_CASE("Test Interpreter special forms: begin and define and list", "[interpreter]") {
 
   {
@@ -967,6 +995,21 @@ TEST_CASE("Test invalid length arguments", "[interpreter]") {
 TEST_CASE("Test invalid append arguments", "[interpreter]") {
   std::string input = R"(
 (append 1 (list 1 3 4))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid join arguments", "[interpreter]") {
+  std::string input = R"(
+(join (list 1 2 3) 23 (list 1 23 4))
 )";
 
   Interpreter interp;

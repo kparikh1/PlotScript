@@ -465,6 +465,21 @@ TEST_CASE("Test Interpreter result with simple procedures (join)", "[interpreter
   REQUIRE(result == exp);
 }
 
+TEST_CASE("Test Interpreter result with simple procedures (range)", "[interpreter]") {
+  // range
+  std::string program = "(range 1 6 1)";
+  INFO(program);
+  Expression result = run(program);
+  Expression exp;
+  exp.getTail().emplace_back(Expression(1));
+  exp.getTail().emplace_back(Expression(2));
+  exp.getTail().emplace_back(Expression(3));
+  exp.getTail().emplace_back(Expression(4));
+  exp.getTail().emplace_back(Expression(5));
+  exp.getTail().emplace_back(Expression(6));
+  REQUIRE(result == exp);
+}
+
 TEST_CASE("Test Interpreter special forms: begin and define and list", "[interpreter]") {
 
   {
@@ -872,6 +887,21 @@ TEST_CASE("Test empty argument to rest", "[interpreter]") {
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
 }
 
+TEST_CASE("Test multiple argument to range", "[interpreter]") {
+  std::string input = R"(
+(range 0 1 2 3)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
 TEST_CASE("Test invalid real arguments", "[interpreter]") {
   std::string input = R"(
 (real 1)
@@ -1010,6 +1040,66 @@ TEST_CASE("Test invalid append arguments", "[interpreter]") {
 TEST_CASE("Test invalid join arguments", "[interpreter]") {
   std::string input = R"(
 (join (list 1 2 3) 23 (list 1 23 4))
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid range arguments (complex)", "[interpreter]") {
+  std::string input = R"(
+(range (- I I) 3 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid range arguments (begin/end)", "[interpreter]") {
+  std::string input = R"(
+(range 2 1 1)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid range arguments (zero incement)", "[interpreter]") {
+  std::string input = R"(
+(range 1 4 0)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test invalid range arguments (negative incement)", "[interpreter]") {
+  std::string input = R"(
+(range 0 5 (- 1))
 )";
 
   Interpreter interp;

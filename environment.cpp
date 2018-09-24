@@ -299,7 +299,26 @@ Expression join(const std::vector<Expression> &args) {
     }
   }
   return result;
-}
+};
+
+Expression range(const std::vector<Expression> &args) {
+  if (nargs_equal(args, 3)) {
+    for (auto &arg:args)
+      if (!arg.isHeadNumber())
+        throw SemanticError("Error: Argument in Range not a number or complex");
+    if (args.cbegin()->head().asNumber() > (args.cbegin() + 1)->head().asNumber())
+      throw SemanticError("Error: First argument is smaller than second in range");
+    if (args.cend()->head().asNumber() <= 0)
+      throw SemanticError("Error: negative or zero increment in range");
+    Expression result;
+    for (double i = args.cbegin()->head().asNumber(); i <= (args.cbegin() + 1)->head().asNumber();
+         i = i + (args.cbegin() + 2)->head().asNumber())
+      result.getTail().emplace_back(Expression(i));
+    return result;
+  } else {
+    throw SemanticError("Error: Invalid number of arguments in Range");
+  }
+};
 
 const double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
@@ -455,4 +474,7 @@ void Environment::reset() {
 
   // Procedure: join;
   envmap.emplace("join", EnvResult(ProcedureType, join));
+
+  // Procedure: range;
+  envmap.emplace("range", EnvResult(ProcedureType, range));
 }

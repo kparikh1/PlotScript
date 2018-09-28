@@ -113,16 +113,12 @@ Expression lambda(const std::vector<Expression> &args, const Environment &env) {
   Expression lambda = *(args.cend() - 1);
   Environment dummyEnv(env);
   uint8_t i = 0;
-  for (auto a:(lambda.getTail().cend() - 1)->getTail()) {
+  for (auto a:lambda.getTail().cbegin()->getTail()) {
     if (!env.is_exp(a.head()) && !a.isHeadNumCom()) {
       dummyEnv.add_exp(a.head(), *(args.cbegin() + i));
       i++;
     }
-    if (i == args.size())
-      throw SemanticError("Error: Too Many arguments to Lambda Function");
   }
-  if (i != args.size() - 1)
-    throw SemanticError("Error: Not enough arguments to Lambda");
 
   return (lambda.getTail().end() - 1)->eval(dummyEnv);
 

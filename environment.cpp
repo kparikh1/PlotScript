@@ -99,6 +99,9 @@ Expression div(const std::vector<Expression> &args) {
     } else {
       throw SemanticError("Error in call to division: invalid argument.");
     }
+  } else if (nargs_equal(args, 1)) {
+    if (args.cbegin()->isHeadNumCom())
+      result = 1. / args.cbegin()->head().getComplex();
   } else {
     throw SemanticError("Error in call to division: invalid number of arguments.");
   }

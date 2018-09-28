@@ -239,7 +239,7 @@ Expression Expression::handle_lambda() {
       throw SemanticError("Error: Invalid variable definitions in Lambda");
 
   Expression result;
-  m_tail.begin()->getTail().emplace_back(Expression(m_tail.cbegin()->head()));
+  m_tail.begin()->getTail().insert(m_tail.cbegin()->getTail().cbegin(), Expression(m_tail.cbegin()->head()));
   m_tail.begin()->head().Clear();
   for (auto a:m_tail)
     result.getTail().emplace_back(a);
@@ -249,7 +249,26 @@ Expression Expression::handle_lambda() {
 }
 
 Expression Expression::handle_apply(Environment &env) {
-  return Expression(0);
+  if (m_tail.size() != 2)
+    throw SemanticError("Error: Not enough Arguments to Apply");
+  if ((!env.is_lambda(m_tail.cbegin()->head()) && !env.is_proc(m_tail.cbegin()->head())) || m_tail.cbegin()->isList())
+    throw SemanticError("Error: First argument to apply not a procedure");
+  if (!(m_tail.cbegin() + 1)->isList())
+    throw SemanticError("Error: Second argument to apply not a list");
+
+  Expression result = *m_tail.cbegin();
+  for (auto &a:(m_tail.cbegin() + 1)->m_tail)
+    result.m_tail.push_back(a);
+  try {
+    result = result.eval(env);
+  }
+  catch (SemanticError error) {
+    std::string errorName = "Error during apply: ";
+    errorName.append(error.what());
+    throw SemanticError(errorName);
+  }
+
+  return result;
 }
 
 // this is a simple recursive version. the iterative version is more

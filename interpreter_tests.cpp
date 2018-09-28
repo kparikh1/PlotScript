@@ -567,6 +567,63 @@ TEST_CASE("Test Interpreter with lambda Expression (shadowing)", "[interpreter]"
 
 }
 
+TEST_CASE("Test Interpreter with apply", "[interpreter]") {
+  { // simple apply function
+    std::string program = "(apply + (list 1 2 3 4))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(10));
+  }
+  { // simple complex apply function
+    std::string
+        program =
+        "(begin (define complexAsList (lambda (x) (list (real x) (imag x)))) (apply complexAsList (list (+ 1 (* 3 I)))))";
+    INFO(program);
+    Expression result = run(program);
+    Expression expected;
+    expected.getTail().emplace_back(Expression(1));
+    expected.getTail().emplace_back(Expression(3));
+    REQUIRE(result == expected);
+  }
+  { // complex apply function
+    std::string program = "(begin (define linear (lambda (a b x) (+ (* a x) b))) (apply linear (list 3 4 5)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(19));
+  }
+  { // Error: second argument to apply not a list
+    std::string input = R"(
+  (apply + 3)
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  { // Error: first argument to apply not a procedure
+    std::string input = R"(
+  (apply (+ z I) (list 0))
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  { // Error: during apply: Error in call to division: invalid number of arguments.
+    std::string input = R"(
+  (apply / (list 1 2 4))
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+
+}
+
 TEST_CASE("Test a medium-sized expression", "[interpreter]") {
 
   {

@@ -552,6 +552,21 @@ TEST_CASE("Test Interpreter with lambda Expression (double)", "[interpreter]") {
 
 }
 
+TEST_CASE("Test Interpreter with lambda Expression (shadowing)", "[interpreter]") {
+
+  std::string
+      program = "(begin (define a 1) (define x 100) (define f (lambda (x) (begin (define b 12) (+ a b x)))) (f 2))";
+  std::istringstream iss(program);
+
+  Interpreter interp;
+
+  REQUIRE(interp.parseStream(iss));
+  INFO(program);
+  Expression result = run(program);
+  REQUIRE(result == Expression(15.));
+
+}
+
 TEST_CASE("Test a medium-sized expression", "[interpreter]") {
 
   {

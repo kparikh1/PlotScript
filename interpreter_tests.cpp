@@ -624,6 +624,64 @@ TEST_CASE("Test Interpreter with apply", "[interpreter]") {
 
 }
 
+TEST_CASE("Test Interpreter with map", "[interpreter]") {
+  { // simple apply function
+    std::string program = "(map / (list 1 2 4))";
+    INFO(program);
+    Expression result = run(program);
+    Expression expected;
+    expected.getTail().emplace_back(Expression(1));
+    expected.getTail().emplace_back(Expression(0.5));
+    expected.getTail().emplace_back(Expression(0.25));
+    REQUIRE(result == expected);
+  }
+  { // simple complex map function
+    std::string
+        program =
+        "(begin (define f (lambda (x) (sin x))) (map f (list (- pi) (/ (- pi) 2) 0 (/ pi 2) pi)))";
+    INFO(program);
+    Expression result = run(program);
+    Expression expected;
+    expected.getTail().emplace_back(Expression(0));
+    expected.getTail().emplace_back(Expression(-1));
+    expected.getTail().emplace_back(Expression(0));
+    expected.getTail().emplace_back(Expression(1));
+    expected.getTail().emplace_back(Expression(0));
+    REQUIRE(result == expected);
+  }
+  { // Error: second argument to map not a list
+    std::string input = R"(
+  (map + 3)
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  { // Error: first argument to map not a procedure
+    std::string input = R"(
+  (map 3 (list 1 2 3))
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  { // Error: during map: Error in call to division: invalid number of arguments.
+    std::string input = R"(
+  (begin (define addtwo (lambda (x y) (+ x y))) (map addtwo (list 1 2 3)))
+)";
+    Interpreter interp;
+    std::istringstream iss(input);
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+
+}
+
 TEST_CASE("Test a medium-sized expression", "[interpreter]") {
 
   {

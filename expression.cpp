@@ -262,13 +262,38 @@ Expression Expression::handle_apply(Environment &env) {
   try {
     result = result.eval(env);
   }
-  catch (SemanticError error) {
+  catch (SemanticError &error) {
     std::string errorName = "Error during apply: ";
     errorName.append(error.what());
     throw SemanticError(errorName);
   }
 
   return result;
+}
+
+Expression Expression::handle_map(Environment &env) {
+  if (m_tail.size() != 2)
+    throw SemanticError("Error: Not enough Arguments to map");
+  if ((!env.is_lambda(m_tail.cbegin()->head()) && !env.is_proc(m_tail.cbegin()->head())) || m_tail.cbegin()->isList())
+    throw SemanticError("Error: First argument to map not a procedure");
+  if (!(m_tail.cbegin() + 1)->isList())
+    throw SemanticError("Error: Second argument to map not a list");
+
+  Expression result;
+  Expression entry = Expression(m_tail.cbegin()->head());
+  for (auto a:(m_tail.cbegin() + 1)->getTail()) {
+    entry.m_tail.emplace_back(a);
+    try {
+      result.m_tail.emplace_back(entry.eval(env));
+    } catch (SemanticError &error) {
+      std::string errorName = "Error during map: ";
+      errorName.append(error.what());
+      throw SemanticError(errorName);
+    }
+    entry.m_tail.clear();
+  }
+  return result;
+
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -297,6 +322,9 @@ Expression Expression::eval(Environment &env) {
     // handle apply special-form
   else if (m_head.isSymbol() && m_head.asSymbol() == "apply")
     return handle_apply(env);
+    // handle map special-form
+  else if (m_head.isSymbol() && m_head.asSymbol() == "map")
+    return handle_map(env);
     // else attempt to treat as procedure
   else {
     std::vector<Expression> results;

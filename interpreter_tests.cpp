@@ -523,6 +523,20 @@ TEST_CASE("Test Interpreter special forms: begin and define and list", "[interpr
   }
 }
 
+TEST_CASE("Test Interpreter with lambda Expression (double)", "[interpreter]") {
+
+  std::string program = "(begin (define double (lambda (x) (* 2 x))) (double 2))";
+  std::istringstream iss(program);
+
+  Interpreter interp;
+
+  REQUIRE(interp.parseStream(iss));
+  INFO(program);
+  Expression result = run(program);
+  REQUIRE(result == Expression(4.));
+
+}
+
 TEST_CASE("Test a medium-sized expression", "[interpreter]") {
 
   {
@@ -890,6 +904,21 @@ TEST_CASE("Test empty argument to rest", "[interpreter]") {
 TEST_CASE("Test multiple argument to range", "[interpreter]") {
   std::string input = R"(
 (range 0 1 2 3)
+)";
+
+  Interpreter interp;
+
+  std::istringstream iss(input);
+
+  bool ok = interp.parseStream(iss);
+  REQUIRE(ok);
+
+  REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+TEST_CASE("Test multiple argument to lambda", "[interpreter]") {
+  std::string input = R"(
+(lambda (x) (*2 x) (- x))
 )";
 
   Interpreter interp;

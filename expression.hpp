@@ -86,6 +86,9 @@ public:
   /// convienience member to determine if the expression is a list type
   bool isList() const noexcept;
 
+  /// convienience member to determine if the expression is a lambda type
+  bool isLambda() const noexcept;
+
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment &env);
 
@@ -96,6 +99,8 @@ private:
 
   // the head of the expression
   Atom m_head;
+
+  bool m_Lambda = false;
 
   // the tail list is expressed as a vector for access efficiency
   // and cache coherence, at the cost of wasted memory.
@@ -109,6 +114,7 @@ private:
   Expression handle_define(Environment &env);
   Expression handle_begin(Environment &env);
   Expression handle_list(Environment &env);
+  Expression handle_lambda(Environment &env);
 };
 
 /// Render expression to output stream

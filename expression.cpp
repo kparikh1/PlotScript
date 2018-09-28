@@ -74,6 +74,10 @@ bool Expression::isList() const noexcept {
   return (m_head.isSymbol() && m_head.asSymbol().empty()) || !m_tail.empty();
 }
 
+bool Expression::isLambda() const noexcept {
+  return m_Lambda;
+}
+
 void Expression::append(const Atom &a) {
   m_tail.emplace_back(a);
 }
@@ -104,6 +108,26 @@ Expression::ConstIteratorType Expression::tailConstEnd() const noexcept {
   return m_tail.cend();
 }
 
+Expression lambda(const std::vector<Expression> &args, const Environment &env) {
+
+  Expression lambda = *(args.cend() - 1);
+  Environment dummyEnv(env);
+  uint8_t i = 0;
+  for (auto a:(lambda.getTail().cend() - 1)->getTail()) {
+    if (!env.is_exp(a.head()) && !a.isHeadNumCom()) {
+      dummyEnv.add_exp(a.head(), *(args.cbegin() + i));
+      i++;
+    }
+    if (i == args.size())
+      throw SemanticError("Error: Too Many arguments to Lambda Function");
+  }
+  if (i != args.size() - 1)
+    throw SemanticError("Error: Not enough arguments to Lambda");
+
+  return (lambda.getTail().end() - 1)->eval(dummyEnv);
+
+}
+
 Expression apply(const Atom &op, const std::vector<Expression> &args, const Environment &env) {
 
   // head must be a symbol
@@ -111,22 +135,29 @@ Expression apply(const Atom &op, const std::vector<Expression> &args, const Envi
     throw SemanticError("Error during evaluation: procedure name not symbol");
   }
 
-  // must map to a proc
-  if (!env.is_proc(op)) {
+  // must map to a proc or lambda
+  if (!env.is_proc(op) && !env.is_lambda(op)) {
     throw SemanticError("Error during evaluation: symbol does not name a procedure");
   }
 
-  // map from symbol to proc
-  Procedure proc = env.get_proc(op);
-
-  // call proc with args
-  return proc(args);
+  if (env.is_proc(op)) {
+    // map from symbol to proc
+    Procedure proc = env.get_proc(op);
+    // call proc with args
+    return proc(args);
+  } else {
+    std::vector<Expression> args_Copy = args;
+    args_Copy.push_back(env.get_lambda(op));
+    return lambda(args_Copy, env);
+  }
 }
 
 Expression Expression::handle_lookup(const Atom &head, const Environment &env) {
   if (head.isSymbol()) { // if symbol is in env return value
     if (env.is_exp(head)) {
       return env.get_exp(head);
+    } else if (env.is_lambda(head)) {
+      return env.get_lambda(head);
     } else {
       throw SemanticError("Error during evaluation: unknown symbol");
     }
@@ -195,7 +226,21 @@ Expression Expression::handle_list(Environment &env) {
   }
 
   return result;
+}
 
+Expression Expression::handle_lambda(Environment &env) {
+
+  if (m_tail.size() != 2)
+    throw SemanticError("Error: Invalid number of arguments to Lambda");
+
+  Expression result;
+  m_tail.begin()->getTail().emplace_back(Expression(m_tail.cbegin()->head()));
+  m_tail.begin()->head().Clear();
+  for (auto a:m_tail)
+    result.getTail().emplace_back(a);
+  result.m_Lambda = true;
+
+  return result;
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -218,6 +263,9 @@ Expression Expression::eval(Environment &env) {
   else if (m_head.isSymbol() && m_head.asSymbol() == "list") {
     return handle_list(env);
   }
+    // handle lambda special-form
+  else if (m_head.isSymbol() && m_head.asSymbol() == "lambda")
+    return handle_lambda(env);
     // else attempt to treat as procedure
   else {
     std::vector<Expression> results;
@@ -232,6 +280,9 @@ std::ostream &operator<<(std::ostream &out, const Expression &exp) {
 
   out << "(";
   out << exp.head();
+
+  if (!exp.head().isNone() && !exp.getTail().empty())
+    out << " ";
 
   for (auto e = exp.tailConstBegin(); e != exp.tailConstEnd(); ++e) {
     out << *e;

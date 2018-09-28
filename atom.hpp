@@ -39,6 +39,9 @@ public:
   /// Atom destructor
   ~Atom();
 
+  /// Clear the Atom (sets type to Nonekind)
+  void Clear();
+
   /// predicate to determine if an Atom is of type None
   bool isNone() const noexcept;
 

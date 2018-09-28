@@ -312,7 +312,7 @@ Expression range(const std::vector<Expression> &args) {
       throw SemanticError("Error: negative or zero increment in range");
     Expression result;
     for (double i = args.cbegin()->head().asNumber(); i <= (args.cbegin() + 1)->head().asNumber();
-         i = i + (args.cbegin() + 2)->head().asNumber())
+         i = i + (args.cbegin() + 2)->head().asNumber()) // NOLINT(cert-flp30-c)
       result.getTail().emplace_back(Expression(i));
     return result;
   } else {
@@ -359,6 +359,21 @@ Expression Environment::get_exp(const Atom &sym) const {
   return exp;
 }
 
+Expression Environment::get_lambda(const Atom &sym) const {
+
+  Expression
+      exp;
+
+  if (sym.isSymbol()) {
+    auto result = envmap.find(sym.asSymbol());
+    if ((result != envmap.end()) && (result->second.type == LambdaType)) {
+      exp = result->second.exp;
+    }
+  }
+
+  return exp;
+}
+
 void Environment::add_exp(const Atom &sym, const Expression &exp) {
 
   if (!sym.isSymbol()) {
@@ -370,7 +385,7 @@ void Environment::add_exp(const Atom &sym, const Expression &exp) {
     throw SemanticError("Attempt to overwrite symbol in environemnt");
   }
 
-  envmap.emplace(sym.asSymbol(), EnvResult(ExpressionType, exp));
+  envmap.emplace(sym.asSymbol(), EnvResult(exp.isLambda() ? LambdaType : ExpressionType, exp));
 }
 
 bool Environment::is_proc(const Atom &sym) const {
@@ -379,6 +394,14 @@ bool Environment::is_proc(const Atom &sym) const {
 
   auto result = envmap.find(sym.asSymbol());
   return (result != envmap.end()) && (result->second.type == ProcedureType);
+}
+
+bool Environment::is_lambda(const Atom &sym) const {
+  if (!sym.isSymbol())
+    return false;
+
+  auto result = envmap.find(sym.asSymbol());
+  return (result != envmap.end()) && (result->second.type == LambdaType);
 }
 
 Procedure Environment::get_proc(const Atom &sym) const {
@@ -477,4 +500,8 @@ void Environment::reset() {
 
   // Procedure: range;
   envmap.emplace("range", EnvResult(ProcedureType, range));
+}
+
+Environment::Environment(const Environment &env) {
+  this->envmap = env.envmap;
 }

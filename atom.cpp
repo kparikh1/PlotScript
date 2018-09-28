@@ -75,6 +75,12 @@ Atom::~Atom() {
   }
 }
 
+void Atom::Clear()  {
+  setComplex(std::complex<double> (0,0));
+  setSymbol("");
+  m_type = NoneKind;
+};
+
 bool Atom::isNone() const noexcept {
   return m_type == NoneKind;
 }

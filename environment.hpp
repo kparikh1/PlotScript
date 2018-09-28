@@ -21,7 +21,7 @@ needed.
 \brief A Procedure is a C++ function pointer taking a vector of 
        Expressions as arguments and returning an Expression.
 */
-typedef Expression (*Procedure)(const std::vector<Expression> & args);
+typedef Expression (*Procedure)(const std::vector<Expression> &args);
 
 /*! \class Environment
 \brief A class representing the interpreter environment.
@@ -43,6 +43,9 @@ public:
    * definitions. */
   Environment();
 
+  /// Copy Constructor for Environment
+  Environment(const Environment &env);
+
   /*! Determine if a symbol is known to the environment.
     \param sym the sumbol to lookup
     \return true if the symbol has been defined in the environment
@@ -62,6 +65,12 @@ public:
   */
   Expression get_exp(const Atom &sym) const;
 
+  /*! Get the Expression the argument symbol maps to.
+    \param sym the symbol to lookup
+    \return the lambda the symbol maps
+  */
+  Expression get_lambda(const Atom &sym) const;
+
   /*! Add a mapping from sym argument to the exp argument within the environment.
     \param sym the symbol to add
     \param exp the expression the symbol should map to
@@ -73,6 +82,12 @@ public:
     \return true if thr symbol maps to a procedure
    */
   bool is_proc(const Atom &sym) const;
+
+  /*! Determine if a symbol has been defined as a lambda procedure
+  \param sym the symbol to lookup
+  \return true if thr symbol maps to a lambda procedure
+ */
+  bool is_lambda(const Atom &sym) const;
 
   /*! Get the Procedure the argument symbol maps to
     \param sym the symbol to lookup
@@ -87,9 +102,9 @@ public:
   void reset();
 
 private:
-  
+
   // Environment is a mapping from symbols to expressions or procedures
-  enum EnvResultType { ExpressionType, ProcedureType };
+  enum EnvResultType { ExpressionType, ProcedureType, LambdaType };
 
   struct EnvResult {
     EnvResultType type;
@@ -98,8 +113,8 @@ private:
 
     // constructors for use in container emplace
     EnvResult() = default;
-    EnvResult(EnvResultType t, const Expression &e) : type(t), exp(e){};
-    EnvResult(EnvResultType t, Procedure p) : type(t), proc(p){};
+    EnvResult(EnvResultType t, const Expression &e) : type(t), exp(e) {};
+    EnvResult(EnvResultType t, Procedure p) : type(t), proc(p) {};
   };
 
   // the environment map

@@ -204,6 +204,21 @@ TEST_CASE("Test Interpreter result with simple procedures (add)", "[interpreter]
   }
 }
 
+TEST_CASE("Test Interpreter result with simple procedures (div)", "[interpreter]") {
+  { // div 1 arg
+    std::string program = "(/ 2)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(0.5));
+  }
+  { // div 2 args
+    std::string program = "(/ 6 3)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(2));
+  }
+}
+
 TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter]") {
 
   { // sqrt

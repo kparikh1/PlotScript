@@ -311,7 +311,7 @@ Expression range(const std::vector<Expression> &args) {
         throw SemanticError("Error: Argument in Range not a number or complex");
     if (args.cbegin()->head().asNumber() > (args.cbegin() + 1)->head().asNumber())
       throw SemanticError("Error: First argument is smaller than second in range");
-    if (args.cend()->head().asNumber() <= 0)
+    if ((args.cend() - 1)->head().asNumber() <= 0)
       throw SemanticError("Error: negative or zero increment in range");
     Expression result;
     for (double i = args.cbegin()->head().asNumber(); i <= (args.cbegin() + 1)->head().asNumber();

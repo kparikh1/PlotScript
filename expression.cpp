@@ -231,6 +231,12 @@ Expression Expression::handle_lambda() {
 
   if (m_tail.size() != 2)
     throw SemanticError("Error: Invalid number of arguments to Lambda");
+  for (const auto &a:m_tail)
+    if (!a.isList() && !a.isHeadSymbol())
+      throw SemanticError("Error: Invalid type of argument to Lambda");
+  for (const auto &a:m_tail.cbegin()->m_tail)
+    if (!a.isHeadSymbol())
+      throw SemanticError("Error: Invalid variable definitions in Lambda");
 
   Expression result;
   m_tail.begin()->getTail().emplace_back(Expression(m_tail.cbegin()->head()));
@@ -240,6 +246,10 @@ Expression Expression::handle_lambda() {
   result.m_Lambda = true;
 
   return result;
+}
+
+Expression Expression::handle_apply(Environment &env) {
+  return Expression(0);
 }
 
 // this is a simple recursive version. the iterative version is more
@@ -265,6 +275,9 @@ Expression Expression::eval(Environment &env) {
     // handle lambda special-form
   else if (m_head.isSymbol() && m_head.asSymbol() == "lambda")
     return handle_lambda();
+    // handle apply special-form
+  else if (m_head.isSymbol() && m_head.asSymbol() == "apply")
+    return handle_apply(env);
     // else attempt to treat as procedure
   else {
     std::vector<Expression> results;

@@ -115,6 +115,7 @@ private:
   Expression handle_begin(Environment &env);
   Expression handle_list(Environment &env);
   Expression handle_lambda();
+  Expression handle_apply(Environment &env);
 };
 
 /// Render expression to output stream

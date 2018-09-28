@@ -112,12 +112,15 @@ Expression lambda(const std::vector<Expression> &args, const Environment &env) {
 
   Expression lambda = *(args.cend() - 1);
   Environment dummyEnv(env);
-  uint8_t i = 0;
+  auto it = args.cbegin();
   for (auto a:lambda.getTail().cbegin()->getTail()) {
-    if (!env.is_exp(a.head()) && !a.isHeadNumCom()) {
-      dummyEnv.add_exp(a.head(), *(args.cbegin() + i));
-      i++;
+    if (!env.is_exp(a.head())) {
+      dummyEnv.add_exp(a.head(), *it);
+    } else {
+      dummyEnv.rem_exp(a.head());
+      dummyEnv.add_exp(a.head(), *it);
     }
+    ++it;
   }
 
   return (lambda.getTail().end() - 1)->eval(dummyEnv);

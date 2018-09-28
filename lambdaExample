@@ -1,0 +1,8 @@
+(begin
+  (define a 1)
+  (define x 100)
+  (define f (lambda (x) (begin
+                          (define b 12)
+                          (+ a b x))))
+  (f 2)
+)

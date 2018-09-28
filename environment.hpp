@@ -77,6 +77,12 @@ public:
    */
   void add_exp(const Atom &sym, const Expression &exp);
 
+  /*! Add a mapping from sym argument to the exp argument within the environment.
+  \param sym the symbol to add
+  \param exp the expression the symbol should map to
+ */
+  void rem_exp(const Atom &sym);
+
   /*! Determine if a symbol has been defined as a procedure
     \param sym the symbol to lookup
     \return true if thr symbol maps to a procedure

@@ -362,6 +362,15 @@ Expression Environment::get_exp(const Atom &sym) const {
   return exp;
 }
 
+void Environment::rem_exp(const Atom &sym) {
+
+  if (!sym.isSymbol()) {
+    throw SemanticError("Attempt to remove non-symbol to environment");
+  }
+
+  envmap.erase(sym.asSymbol());
+}
+
 Expression Environment::get_lambda(const Atom &sym) const {
 
   Expression

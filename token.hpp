@@ -21,7 +21,9 @@ public:
   enum TokenType {
     OPEN,  //< open tag, aka '('
     CLOSE, //< close tag, aka ')'
-    STRING //< string tag
+    STRING, //< string tag
+    STRINGOPEN, //< open tag, akak '\"'
+    STRINGCLOSE //< close tag, aka '\"'
   };
 
   /// construct a token of type t (if string default to empty value)

@@ -13,7 +13,7 @@ Defines the Atom type and associated functions.
 This class provides value semantics.
 */
 class Atom {
-public:
+ public:
 
   /// Construct a default Atom of type None
   Atom();
@@ -29,6 +29,12 @@ public:
 
   /// Construct an Atom directly from a Token
   explicit Atom(const Token &token);
+
+  /// Construct an Atom directly from a Token and is known string type
+  explicit Atom(const Token &token, const bool &string);
+
+  /// Construct an Atom directly from a string value
+  explicit Atom(const std::string &value, const bool &string);
 
   /// Copy-construct an Atom
   Atom(const Atom &x);
@@ -54,14 +60,20 @@ public:
   /// predicate to determine if an Atom is of type Symbol
   bool isSymbol() const noexcept;
 
+  /// predicate to determine if an Atom is of type String
+  bool isString() const noexcept;
+
   /// returns if it is complex or a number
   bool isNumCom() const noexcept;
 
   /// value of Atom as a number, return 0 if not a Number
   double asNumber() const noexcept;
 
-  /// value of Atom as a number, returns empty-string if not a Symbol
+  /// value of Atom as a symbol, returns empty-string if not a Symbol
   std::string asSymbol() const noexcept;
+
+  /// value of Atom as a string, returns empty-string if not a string
+  std::string asString() const noexcept;
 
   /// value of Atom as a complex number, returns 0 if not a Complex
   std::complex<double> asComplex() const noexcept;
@@ -72,10 +84,10 @@ public:
   /// equality comparison based on type and value
   bool operator==(const Atom &right) const noexcept;
 
-private:
+ private:
 
   // internal enum of known types
-  enum Type { NoneKind, NumberKind, SymbolKind, ComplexKind };
+  enum Type { NoneKind, NumberKind, SymbolKind, ComplexKind, StringKind };
 
   // track the type
   Type m_type;
@@ -92,6 +104,9 @@ private:
 
   // helper to set type and value of Symbol
   void setSymbol(const std::string &value);
+
+  // helper to set type and value of String
+  void setString(const std::string &value);
 
   // helper to set type and value of Complex
   void setComplex(const std::complex<double> &comp);

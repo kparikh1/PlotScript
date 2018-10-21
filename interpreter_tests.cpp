@@ -695,13 +695,13 @@ TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ 1 -2)",
-                                         "(+ -3 1 1)",
-                                         "(- 1)",
-                                         "(- 1 2)",
-                                         "(* 1 -1)",
-                                         "(* 1 1 -1)",
-                                         "(/ -1 1)",
-                                         "(/ 1 -1)"};
+        "(+ -3 1 1)",
+        "(- 1)",
+        "(- 1 2)",
+        "(* 1 -1)",
+        "(* 1 1 -1)",
+        "(/ -1 1)",
+        "(/ 1 -1)"};
 
     for (auto s : programs) {
       Expression result = run(s);
@@ -714,10 +714,10 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ -1 (- I))",
-                                         "(+ -3 1 1 (- I))",
-                                         "(- -1  I)",
-                                         "(* 1 (+ -1 (- I)))",
-                                         "(* 1 I I I I (+ -1 (- I)))",};
+        "(+ -3 1 1 (- I))",
+        "(- -1  I)",
+        "(* 1 (+ -1 (- I)))",
+        "(* 1 I I I I (+ -1 (- I)))",};
     std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
@@ -729,9 +729,9 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 TEST_CASE("Test some semantically invalid expresions", "[interpreter]") {
 
   std::vector<std::string> programs = {"(@ none)", // so such procedure
-                                       "(- 1 1 2)", // too many arguments
-                                       "(define begin 1)", // redefine special form
-                                       "(define pi 3.14)"}; // redefine builtin symbol
+      "(- 1 1 2)", // too many arguments
+      "(define begin 1)", // redefine special form
+      "(define pi 3.14)"}; // redefine builtin symbol
   for (auto s : programs) {
     Interpreter interp;
 
@@ -1284,4 +1284,22 @@ TEST_CASE("Test invalid range arguments (negative incement)", "[interpreter]") {
   REQUIRE(ok);
 
   REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+}
+
+/// Milestone 2 Tests
+/// String Tests
+
+TEST_CASE("Test string implemenation", "[interpreter]") {
+  {
+    std::string program = "(\"foo\")";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("foo", true));
+  }
+  {
+    std::string program = "(\"a string with spaces\")";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("a string with spaces", true));
+  }
 }

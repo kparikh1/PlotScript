@@ -2,22 +2,24 @@
 
 #include <stack>
 
-bool setHead(Expression &exp, const Token &token) {
+bool setHead(Expression &exp, const Token &token, const bool &string) {
 
-  Atom a(token);
+  Atom a(token, string);
 
   exp.head() = a;
 
   return !a.isNone();
 }
 
-bool append(Expression *exp, const Token &token) {
+bool append(Expression *exp, const Token &token, const bool &string) {
 
-  Atom a(token);
+  Atom a(token, string);
 
-  exp->append(a);
+  exp->
+      append(a);
 
-  return !a.isNone();
+  return !a.
+      isNone();
 }
 
 Expression parse(const TokenSequenceType &tokens) noexcept {
@@ -29,6 +31,7 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
     return Expression();
 
   bool athead = false;
+  bool string = false;
 
   // stack tracks the last node created
   std::stack<Expression *> stack;
@@ -49,11 +52,14 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
         num_tokens_seen += 1;
         break;
       }
-    } else {
+    } else if (t.type() == Token::STRINGOPEN) {
+      string = true;
+    } else if (t.type() == Token::STRINGCLOSE);
+    else {
 
       if (athead) {
         if (stack.empty()) {
-          if (!setHead(ast, t)) {
+          if (!setHead(ast, t, string)) {
             return Expression();
           }
           stack.push(&ast);
@@ -62,7 +68,7 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
             return Expression();
           }
 
-          if (!append(stack.top(), t)) {
+          if (!append(stack.top(), t, string)) {
             return Expression();
           }
           stack.push(stack.top()->tail());
@@ -73,7 +79,7 @@ Expression parse(const TokenSequenceType &tokens) noexcept {
           return Expression();
         }
 
-        if (!append(stack.top(), t)) {
+        if (!append(stack.top(), t, string)) {
           return Expression();
         }
       }

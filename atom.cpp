@@ -35,9 +35,36 @@ Atom::Atom(const Token &token) : Atom() {
   }
 }
 
+Atom::Atom(const Token &token, const bool &string) : Atom() {
+
+  // is token a number?
+  double temp;
+  std::istringstream iss(token.asString());
+  if (iss >> temp) {
+    // check for trailing characters if >> succeeds
+    if (iss.rdbuf()->in_avail() == 0) {
+      setNumber(temp);
+    }
+  } else if (string) {
+    setString(token.asString());
+  } else { // else assume symbol
+    // make sure does not start with number
+    if (!std::isdigit(token.asString()[0])) {
+      setSymbol(token.asString());
+    }
+  }
+}
+
 Atom::Atom(const std::string &value) : Atom() {
 
   setSymbol(value);
+}
+
+Atom::Atom(const std::string &value, const bool &string) {
+  if (string)
+    setString(value);
+  else
+    setSymbol(value);
 }
 
 Atom::Atom(const Atom &x) : Atom() {
@@ -47,6 +74,8 @@ Atom::Atom(const Atom &x) : Atom() {
     setSymbol(x.stringValue);
   } else if (x.isComplex()) {
     setComplex(x.complexValue);
+  } else if (x.isString()) {
+    setString(stringValue);
   }
 }
 
@@ -61,7 +90,8 @@ Atom &Atom::operator=(const Atom &x) {
       setSymbol(x.stringValue);
     } else if (x.m_type == ComplexKind) {
       setComplex(x.complexValue);
-    }
+    } else if (x.m_type == StringKind)
+      setString(x.stringValue);
   }
   return *this;
 }
@@ -75,8 +105,8 @@ Atom::~Atom() {
   }
 }
 
-void Atom::Clear()  {
-  setComplex(std::complex<double> (0,0));
+void Atom::Clear() {
+  setComplex(std::complex<double>(0, 0));
   setSymbol("");
   m_type = NoneKind;
 };
@@ -142,6 +172,17 @@ std::string Atom::asSymbol() const noexcept {
   return result;
 }
 
+std::string Atom::asString() const noexcept {
+
+  std::string result;
+
+  if (m_type == StringKind) {
+    result = stringValue;
+  }
+
+  return result;
+}
+
 std::complex<double> Atom::asComplex() const noexcept {
 
   return isComplex() ? complexValue : std::complex<double>(0, 0);
@@ -157,34 +198,53 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-  case NoneKind:
-    if (right.m_type != NoneKind)
-      return false;
-    break;
-  case NumberKind: {
-    if (right.m_type != NumberKind)
-      return false;
-    if (Epsilon(complexValue.real(), right.complexValue.real()))
-      return false;
-  }
-    break;
-  case ComplexKind: {
-    if (right.m_type != ComplexKind ||
-        Epsilon(complexValue.real(), right.complexValue.real())
-        || Epsilon(complexValue.imag(), right.complexValue.imag()))
-      return false;
-  }
-    break;
-  case SymbolKind: {
-    if (right.m_type != SymbolKind)
-      return false;
-    return stringValue == right.stringValue;
-  }
-    break;
-  default:return false;
+    case NoneKind:
+      if (right.m_type != NoneKind)
+        return false;
+      break;
+    case NumberKind: {
+      if (right.m_type != NumberKind)
+        return false;
+      if (Epsilon(complexValue.real(), right.complexValue.real()))
+        return false;
+    }
+      break;
+    case ComplexKind: {
+      if (right.m_type != ComplexKind ||
+          Epsilon(complexValue.real(), right.complexValue.real())
+          || Epsilon(complexValue.imag(), right.complexValue.imag()))
+        return false;
+    }
+      break;
+    case SymbolKind: {
+      if (right.m_type != SymbolKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+    case StringKind: {
+      if (right.m_type != StringKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+      break;
+    default:return false;
   }
 
   return true;
+}
+bool Atom::isString() const noexcept {
+  return m_type == StringKind;
+}
+void Atom::setString(const std::string &value) {
+  // we need to ensure the destructor of the symbol string is called
+  if (m_type == SymbolKind) {
+    stringValue.~basic_string();
+  }
+
+  m_type = StringKind;
+
+  // copy construct in place
+  new(&stringValue) std::string(value);
 }
 
 bool operator!=(const Atom &left, const Atom &right) noexcept {
@@ -202,6 +262,9 @@ std::ostream &operator<<(std::ostream &out, const Atom &a) {
   }
   if (a.isComplex()) {
     out << a.asComplex().real() << "," << a.asComplex().imag();
+  }
+  if (a.isString()) {
+    out << "\"" << a.asString() << "\"";
   }
   return out;
 }

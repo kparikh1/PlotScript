@@ -28,6 +28,10 @@ Expression::Expression(const std::string &value) {
   m_head = Atom(value);
 }
 
+Expression::Expression(const std::string &value, const bool &string) {
+  m_head = Atom(value, string);
+}
+
 Expression::Expression(const std::complex<double> &value) {
   m_head = Atom(value);
 }
@@ -162,7 +166,9 @@ Expression Expression::handle_lookup(const Atom &head, const Environment &env) {
     }
   } else if (head.isNumber()) {
     return Expression(head);
-  } else {
+  } else if (head.isString())
+    return Expression(head);
+  else {
     throw SemanticError("Error during evaluation: Invalid type in terminal expression");
   }
 }

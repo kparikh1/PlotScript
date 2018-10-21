@@ -20,7 +20,7 @@ An expression is an atom called the head followed by a (possibly empty)
 list of expressions called the tail.
  */
 class Expression {
-public:
+ public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
@@ -38,8 +38,11 @@ public:
   /// Construct Expression with double
   explicit Expression(const double &value);
 
-  /// Construct Expression with double
+  /// Construct Expression with symbol
   explicit Expression(const std::string &value);
+
+  /// Construct Expression with string value
+  explicit Expression(const std::string &value, const bool &string);
 
   /// Construct Expression with complex
   explicit Expression(const std::complex<double> &value);
@@ -95,7 +98,7 @@ public:
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression &exp) const noexcept;
 
-private:
+ private:
 
   // the head of the expression
   Atom m_head;

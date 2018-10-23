@@ -92,14 +92,16 @@ Expression subneg(const std::vector<Expression> &args) {
 Expression div(const std::vector<Expression> &args) {
 
   std::complex<double> result;
-  bool complex = args[0].isHeadComplex() || args[1].isHeadComplex();
+  bool complex = false;
   if (nargs_equal(args, 2)) {
+    complex = args[0].isHeadComplex() || args[1].isHeadComplex();
     if (args[0].isHeadNumCom() && args[1].isHeadNumCom()) {
       result = args[0].head().getComplex() / args[1].head().getComplex();
     } else {
       throw SemanticError("Error in call to division: invalid argument.");
     }
   } else if (nargs_equal(args, 1)) {
+    complex = args[0].isHeadComplex();
     if (args.cbegin()->isHeadNumCom())
       result = 1. / args.cbegin()->head().getComplex();
   } else {
@@ -323,7 +325,34 @@ Expression range(const std::vector<Expression> &args) {
   }
 };
 
-const double PI = std::atan2(0, -1);
+Expression setProperty(const std::vector<Expression> &args) {
+  if (nargs_equal(args, 3)) {
+    if (args.cbegin()->head().isString()) {
+      Expression result = *(args.cend() - 1);
+      result.addProperty(args.cbegin()->head().asString(), *(args.cbegin() + 1));
+      return result;
+    } else {
+      throw SemanticError("Error: First argument is not a string to set property");
+    }
+  } else {
+    throw SemanticError("Error: Invalid number of arguements in Set Properties");
+  }
+}
+
+Expression getProperty(const std::vector<Expression> &args) {
+  if (nargs_equal(args, 2)) {
+    if (args.cbegin()->head().isString()) {
+      std::string key = args.cbegin()->head().asString();
+      Expression result(*(args.cend() - 1));
+      return result.getProperty(key);
+    } else
+      throw SemanticError("Error: First Argument not a string");
+  } else
+    throw SemanticError("Error: Invalid number of arguments in Get Properties");
+}
+
+const
+double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
 const std::complex<double> I(0.0, 1.0);
 
@@ -512,6 +541,12 @@ void Environment::reset() {
 
   // Procedure: range;
   envmap.emplace("range", EnvResult(ProcedureType, range));
+
+  // Procedure: set-property
+  envmap.emplace("set-property", EnvResult(ProcedureType, setProperty));
+
+  // Procedure: get-property
+  envmap.emplace("get-property", EnvResult(ProcedureType, getProperty));
 }
 
 Environment::Environment(const Environment &env) {

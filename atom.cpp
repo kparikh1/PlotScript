@@ -35,7 +35,7 @@ Atom::Atom(const Token &token) : Atom() {
   }
 }
 
-Atom::Atom(const Token &token, const bool &string) : Atom() {
+Atom::Atom(const Token &token, bool &string) : Atom() {
 
   // is token a number?
   double temp;
@@ -47,6 +47,7 @@ Atom::Atom(const Token &token, const bool &string) : Atom() {
     }
   } else if (string) {
     setString(token.asString());
+    string = false;
   } else { // else assume symbol
     // make sure does not start with number
     if (!std::isdigit(token.asString()[0])) {
@@ -99,7 +100,7 @@ Atom &Atom::operator=(const Atom &x) {
 Atom::~Atom() {
 
 // we need to ensure the destructor of the symbol string is called
-  if (m_type == SymbolKind) {
+  if (m_type == SymbolKind || m_type == StringKind) {
     stringValue.~
         basic_string();
   }
@@ -140,7 +141,7 @@ void Atom::setNumber(double value) {
 void Atom::setSymbol(const std::string &value) {
 
   // we need to ensure the destructor of the symbol string is called
-  if (m_type == SymbolKind) {
+  if (m_type == SymbolKind || m_type == StringKind) {
     stringValue.~basic_string();
   }
 
@@ -198,36 +199,36 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-    case NoneKind:
-      if (right.m_type != NoneKind)
-        return false;
-      break;
-    case NumberKind: {
-      if (right.m_type != NumberKind)
-        return false;
-      if (Epsilon(complexValue.real(), right.complexValue.real()))
-        return false;
-    }
-      break;
-    case ComplexKind: {
-      if (right.m_type != ComplexKind ||
-          Epsilon(complexValue.real(), right.complexValue.real())
-          || Epsilon(complexValue.imag(), right.complexValue.imag()))
-        return false;
-    }
-      break;
-    case SymbolKind: {
-      if (right.m_type != SymbolKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-    case StringKind: {
-      if (right.m_type != StringKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-      break;
-    default:return false;
+  case NoneKind:
+    if (right.m_type != NoneKind)
+      return false;
+    break;
+  case NumberKind: {
+    if (right.m_type != NumberKind)
+      return false;
+    if (Epsilon(complexValue.real(), right.complexValue.real()))
+      return false;
+  }
+    break;
+  case ComplexKind: {
+    if (right.m_type != ComplexKind ||
+        Epsilon(complexValue.real(), right.complexValue.real())
+        || Epsilon(complexValue.imag(), right.complexValue.imag()))
+      return false;
+  }
+    break;
+  case SymbolKind: {
+    if (right.m_type != SymbolKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+  case StringKind: {
+    if (right.m_type != StringKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+    break;
+  default:return false;
   }
 
   return true;
@@ -235,9 +236,10 @@ bool Atom::operator==(const Atom &right) const noexcept {
 bool Atom::isString() const noexcept {
   return m_type == StringKind;
 }
+
 void Atom::setString(const std::string &value) {
   // we need to ensure the destructor of the symbol string is called
-  if (m_type == SymbolKind) {
+  if (m_type == StringKind || m_type == SymbolKind) {
     stringValue.~basic_string();
   }
 

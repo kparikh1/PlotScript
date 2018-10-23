@@ -13,7 +13,7 @@ Defines the Atom type and associated functions.
 This class provides value semantics.
 */
 class Atom {
- public:
+public:
 
   /// Construct a default Atom of type None
   Atom();
@@ -31,7 +31,7 @@ class Atom {
   explicit Atom(const Token &token);
 
   /// Construct an Atom directly from a Token and is known string type
-  explicit Atom(const Token &token, const bool &string);
+  explicit Atom(const Token &token, bool &string);
 
   /// Construct an Atom directly from a string value
   explicit Atom(const std::string &value, const bool &string);
@@ -84,13 +84,13 @@ class Atom {
   /// equality comparison based on type and value
   bool operator==(const Atom &right) const noexcept;
 
- private:
+private:
 
   // internal enum of known types
   enum Type { NoneKind, NumberKind, SymbolKind, ComplexKind, StringKind };
 
   // track the type
-  Type m_type;
+  Type m_type = NoneKind;
 
   // values for the known types. Note the use of a union requires care
   // when setting non POD values (see setSymbol)

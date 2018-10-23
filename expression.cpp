@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <list>
+#include <string>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -18,6 +19,7 @@ Expression::Expression(const Expression &a) {
   for (auto e : a.m_tail) {
     m_tail.emplace_back(e);
   }
+  m_properties = a.m_properties;
 }
 
 Expression::Expression(const double &value) {
@@ -46,6 +48,7 @@ Expression &Expression::operator=(const Expression &a) {
       m_tail.emplace_back(e);
     }
   }
+  m_properties = a.m_properties;
 
   return *this;
 }
@@ -80,6 +83,18 @@ bool Expression::isList() const noexcept {
 
 bool Expression::isLambda() const noexcept {
   return m_Lambda;
+}
+
+void Expression::addProperty(const std::string &key, const Expression &value) {
+  m_properties.emplace(key, value);
+}
+
+Expression Expression::getProperty(std::string key) {
+  auto value = m_properties.find(key);
+  if (value != m_properties.end())
+    return value->second;
+  else
+    return Expression();
 }
 
 void Expression::append(const Atom &a) {
@@ -132,6 +147,10 @@ Expression lambda(const std::vector<Expression> &args, const Environment &env) {
 }
 
 Expression apply(const Atom &op, const std::vector<Expression> &args, const Environment &env) {
+
+  // Return if it is a string
+  if (op.isString())
+    return Expression(op);
 
   // head must be a symbol
   if (!op.isSymbol()) {
@@ -343,6 +362,10 @@ Expression Expression::eval(Environment &env) {
 
 std::ostream &operator<<(std::ostream &out, const Expression &exp) {
 
+  if (exp.head().isNone() && exp.getTail().empty()) {
+    out << "NONE";
+    return out;
+  }
   out << "(";
   out << exp.head();
 

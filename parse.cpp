@@ -2,7 +2,7 @@
 
 #include <stack>
 
-bool setHead(Expression &exp, const Token &token, const bool &string) {
+bool setHead(Expression &exp, const Token &token, bool &string) {
 
   Atom a(token, string);
 
@@ -11,7 +11,7 @@ bool setHead(Expression &exp, const Token &token, const bool &string) {
   return !a.isNone();
 }
 
-bool append(Expression *exp, const Token &token, const bool &string) {
+bool append(Expression *exp, const Token &token, bool &string) {
 
   Atom a(token, string);
 

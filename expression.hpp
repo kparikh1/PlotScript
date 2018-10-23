@@ -6,6 +6,7 @@ Defines the Expression type and assiciated functions.
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "token.hpp"
 #include "atom.hpp"
@@ -20,7 +21,7 @@ An expression is an atom called the head followed by a (possibly empty)
 list of expressions called the tail.
  */
 class Expression {
- public:
+public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
@@ -92,13 +93,19 @@ class Expression {
   /// convienience member to determine if the expression is a lambda type
   bool isLambda() const noexcept;
 
+  /// Add a property to Expression
+  void addProperty(const std::string &key, const Expression &value);
+
+  /// Get value of a property from Expression
+  Expression getProperty(std::string key);
+
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment &env);
 
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression &exp) const noexcept;
 
- private:
+private:
 
   // the head of the expression
   Atom m_head;
@@ -108,6 +115,9 @@ class Expression {
   // the tail list is expressed as a vector for access efficiency
   // and cache coherence, at the cost of wasted memory.
   std::vector<Expression> m_tail;
+
+  // List of Properties
+  std::map<std::string, Expression> m_properties;
 
   // convenience typedef
   typedef std::vector<Expression>::iterator IteratorType;

@@ -695,13 +695,13 @@ TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ 1 -2)",
-        "(+ -3 1 1)",
-        "(- 1)",
-        "(- 1 2)",
-        "(* 1 -1)",
-        "(* 1 1 -1)",
-        "(/ -1 1)",
-        "(/ 1 -1)"};
+                                         "(+ -3 1 1)",
+                                         "(- 1)",
+                                         "(- 1 2)",
+                                         "(* 1 -1)",
+                                         "(* 1 1 -1)",
+                                         "(/ -1 1)",
+                                         "(/ 1 -1)"};
 
     for (auto s : programs) {
       Expression result = run(s);
@@ -714,10 +714,10 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ -1 (- I))",
-        "(+ -3 1 1 (- I))",
-        "(- -1  I)",
-        "(* 1 (+ -1 (- I)))",
-        "(* 1 I I I I (+ -1 (- I)))",};
+                                         "(+ -3 1 1 (- I))",
+                                         "(- -1  I)",
+                                         "(* 1 (+ -1 (- I)))",
+                                         "(* 1 I I I I (+ -1 (- I)))",};
     std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
@@ -729,9 +729,9 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 TEST_CASE("Test some semantically invalid expresions", "[interpreter]") {
 
   std::vector<std::string> programs = {"(@ none)", // so such procedure
-      "(- 1 1 2)", // too many arguments
-      "(define begin 1)", // redefine special form
-      "(define pi 3.14)"}; // redefine builtin symbol
+                                       "(- 1 1 2)", // too many arguments
+                                       "(define begin 1)", // redefine special form
+                                       "(define pi 3.14)"}; // redefine builtin symbol
   for (auto s : programs) {
     Interpreter interp;
 
@@ -1301,5 +1301,92 @@ TEST_CASE("Test string implemenation", "[interpreter]") {
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression("a string with spaces", true));
+  }
+}
+
+TEST_CASE("Test Setting a property", "[interpreter]") {
+  {
+    std::string program = "(set-property \"number\" \"three\" (3))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(3.));
+  }
+  {
+    std::string program = "(set-property \"number\" (3) \"three\")";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("three", true));
+  }
+  {
+    std::string program = "(set-property \"number\" (+ 1 2) \"three\")";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("three", true));
+  }
+  {
+    std::string input = R"(
+(set-property (+ 1 2) "number" "three")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  {
+    std::string input = R"(
+(set-property (+ 1 2) "number" "three" "two")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+}
+
+TEST_CASE("Test getting a property", "[interpreter]") {
+  {
+    std::string program =
+        "(begin (define a (+ 1 I)) (define b (set-property \"note\" \"a complex number\" a)) (get-property \"note\" b))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("a complex number", true));
+  }
+  {
+    std::string input = R"(
+(begin (define a (+ 1 I)) (define b (set-property \"note\" \"a complex number\" a)) (get-property \"foo\" b))
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
+  {
+    std::string input = R"(
+(get-property "note" "two" "Home")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
 }

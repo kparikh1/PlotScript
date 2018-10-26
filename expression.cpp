@@ -86,10 +86,16 @@ bool Expression::isLambda() const noexcept {
 }
 
 void Expression::addProperty(const std::string &key, const Expression &value) {
-  m_properties.emplace(key, value);
+  auto exists = m_properties.find(key);
+  if (exists == m_properties.end())
+    m_properties.emplace(key, value);
+  else {
+    m_properties.erase(exists);
+    m_properties.emplace(key, value);
+  }
 }
 
-Expression Expression::getProperty(std::string key) {
+Expression Expression::getProperty(std::string key) const {
   auto value = m_properties.find(key);
   if (value != m_properties.end())
     return value->second;
@@ -398,6 +404,9 @@ bool Expression::operator==(const Expression &exp) const noexcept {
   }
 
   return result;
+}
+bool Expression::isPoint() const noexcept {
+  return this->getProperty("object-name") == Expression("point", true);
 }
 
 bool operator!=(const Expression &left, const Expression &right) noexcept {

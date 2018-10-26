@@ -1304,6 +1304,8 @@ TEST_CASE("Test string implemenation", "[interpreter]") {
   }
 }
 
+/// Setting and getting property tests
+
 TEST_CASE("Test Setting a property", "[interpreter]") {
   {
     std::string program = "(set-property \"number\" \"three\" (3))";
@@ -1390,3 +1392,15 @@ TEST_CASE("Test getting a property", "[interpreter]") {
     REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
 }
+
+TEST_CASE("Test overwriting a property", "[interpreter]") {
+  {
+    std::string program =
+        "(begin (define p1 (make-point 1 2)) (define p2 (set-property \"size\" 2 p1)) (get-property \"size\" p2) )";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(2.));
+  }
+}
+
+///

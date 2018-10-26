@@ -93,11 +93,14 @@ public:
   /// convienience member to determine if the expression is a lambda type
   bool isLambda() const noexcept;
 
+  /// convienience member to determine if the expression is a point
+  bool isPoint() const noexcept;
+
   /// Add a property to Expression
   void addProperty(const std::string &key, const Expression &value);
 
   /// Get value of a property from Expression
-  Expression getProperty(std::string key);
+  Expression getProperty(std::string key) const;
 
   /// Evaluate expression using a post-order traversal (recursive)
   Expression eval(Environment &env);

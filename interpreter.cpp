@@ -1,7 +1,9 @@
 #include "interpreter.hpp"
+#include "startup_config.hpp"
 
 // system includes
 #include <stdexcept>
+#include <fstream>
 
 // module includes
 #include "token.hpp"
@@ -23,4 +25,12 @@ bool Interpreter::parseStream(std::istream & expression) noexcept{
 Expression Interpreter::evaluate(){
 
   return ast.eval(env);
+}
+Interpreter::Interpreter() {
+
+  std::ifstream ifs(STARTUP_FILE);
+
+  parseStream(ifs);
+  evaluate();
+
 }

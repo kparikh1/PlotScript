@@ -5,43 +5,43 @@ project(PLOTSCRIPT CXX)
 # add any files you create related to the interpreter here
 # excluding unit tests
 set(interpreter_src
-  token.hpp token.cpp
-  atom.hpp atom.cpp
-  environment.hpp environment.cpp
-  expression.hpp expression.cpp
-  parse.hpp parse.cpp
-  interpreter.hpp interpreter.cpp
-  )
+        token.hpp token.cpp
+        atom.hpp atom.cpp
+        environment.hpp environment.cpp
+        expression.hpp expression.cpp
+        parse.hpp parse.cpp
+        interpreter.hpp interpreter.cpp
+        )
 
 # EDIT
 # add any files you create related to interpreter unit testing here
 set(unittest_src
-  catch.hpp
-  atom_tests.cpp
-  environment_tests.cpp
-  expression_tests.cpp
-  interpreter_tests.cpp
-  parse_tests.cpp
-  semantic_error.hpp
-  token_tests.cpp
-  unit_tests.cpp
-  )
+        catch.hpp
+        atom_tests.cpp
+        environment_tests.cpp
+        expression_tests.cpp
+        interpreter_tests.cpp
+        parse_tests.cpp
+        semantic_error.hpp
+        token_tests.cpp
+        unit_tests.cpp
+        )
 
 # EDIT
 # add source for any TUI modules here
 set(tui_src
-  )
+        )
 
 # EDIT
 # add source for any GUI modules here
 set(gui_src
-  )
+        )
 
 # EDIT
 # add source for any GUI tests here
 set(gui_test_src
-  notebook_test.cpp
-)
+        notebook_test.cpp
+        )
 
 
 # ------------------------------------------------
@@ -50,18 +50,18 @@ set(gui_test_src
 
 # main entry point for TUI interface
 set(tui_main
-  plotscript.cpp
-)
+        plotscript.cpp
+        )
 
 # main entry point for GUI interface
 set(gui_main
-  notebook.cpp
-)
+        notebook.cpp
+        )
 
 # try to prevent accidental in-source builds, these cause lots of problems
-if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-  message(FATAL_ERROR "In-source builds not allowed. Remove any files created thus far and use a different directory for the build.")
-endif()
+if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+    message(FATAL_ERROR "In-source builds not allowed. Remove any files created thus far and use a different directory for the build.")
+endif ()
 
 # require a C++11 compiler for all targets
 set(CMAKE_CXX_STANDARD 11)
@@ -70,15 +70,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # configure Qt
 find_package(Qt5 COMPONENTS Widgets Test QUIET)
 if (Qt5Widgets_FOUND AND Qt5Test_FOUND)
-  set(CMAKE_AUTOMOC ON)
-  set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif ()
 
 # optional strict mode
-if(UNIX AND STRICT)
-  message("-- Enabling strict compilation mode")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
-endif()
+if (UNIX AND STRICT)
+    message("-- Enabling strict compilation mode")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+endif ()
 
 # build interpreter library
 add_library(interpreter ${interpreter_src})
@@ -95,54 +95,54 @@ enable_testing()
 add_test(unit_tests unit_tests)
 
 # In the reference environment enable coverage on tests
-if(DEFINED ENV{ECE3574_REFERENCE_ENV})
-  message("-- Enabling test coverage")
-  set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-  set_target_properties(interpreter PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
-  set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} )
-  target_link_libraries(unit_tests interpreter gcov)
-  target_link_libraries(plotscript interpreter gcov)
-  add_custom_target(coverage
-    COMMAND ${CMAKE_COMMAND} -E env "ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/coverage.sh)
-endif()
+if (DEFINED ENV{ECE3574_REFERENCE_ENV})
+    message("-- Enabling test coverage")
+    set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+    set_target_properties(interpreter PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS})
+    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS})
+    target_link_libraries(unit_tests interpreter gcov)
+    target_link_libraries(plotscript interpreter gcov)
+    add_custom_target(coverage
+            COMMAND ${CMAKE_COMMAND} -E env "ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
+            ${CMAKE_CURRENT_SOURCE_DIR}/scripts/coverage.sh)
+endif ()
 
 # In the reference environment enable memory checking on tests
-if(DEFINED ENV{ECE3574_REFERENCE_ENV})
-  message("-- Enabling memory checks")
-  add_custom_target(memtest
-    COMMAND valgrind ${CMAKE_BINARY_DIR}/unit_tests)
-endif()
+if (DEFINED ENV{ECE3574_REFERENCE_ENV})
+    message("-- Enabling memory checks")
+    add_custom_target(memtest
+            COMMAND valgrind ${CMAKE_BINARY_DIR}/unit_tests)
+endif ()
 
 # In the reference environment enable tui tests
-if(DEFINED ENV{ECE3574_REFERENCE_ENV})
-  add_test(plotscript_test python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py)
-endif()
+if (DEFINED ENV{ECE3574_REFERENCE_ENV})
+    add_test(plotscript_test python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py)
+endif ()
 
 # --------------------------------------------------------
 # Build the notebook executable and tests if Qt is available
 # --------------------------------------------------------
 
 if (Qt5Widgets_FOUND AND Qt5Test_FOUND)
-  
-  add_executable(notebook ${gui_main} ${gui_src})
-  if(UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(notebook interpreter Qt5::Widgets pthread)
-  else(UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(notebook interpreter Qt5::Widgets)
-  endif()
 
-  add_executable(notebook_test ${gui_test_src} ${gui_src})
-  if(UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test pthread)
-  else(UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test)
-  endif()
+    add_executable(notebook ${gui_main} ${gui_src})
+    if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
+        target_link_libraries(notebook interpreter Qt5::Widgets pthread)
+    else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
+        target_link_libraries(notebook interpreter Qt5::Widgets)
+    endif ()
 
-  add_test(notebook_test notebook_test)
-  
+    add_executable(notebook_test ${gui_test_src} ${gui_src})
+    if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
+        target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test pthread)
+    else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
+        target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test)
+    endif ()
+
+    add_test(notebook_test notebook_test)
+
 else (Qt5Widgets_FOUND AND Qt5Test_FOUND)
-  message("Qt >= 5.9  needs to be installed to build the notebook interface and related tests.")
+    message("Qt >= 5.9  needs to be installed to build the notebook interface and related tests.")
 endif (Qt5Widgets_FOUND AND Qt5Test_FOUND)
 
 
@@ -159,11 +159,15 @@ if (DOXYGEN_FOUND)
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     # note the option ALL which allows to build the docs together with the application
-    add_custom_target( doc
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        VERBATIM )
+    add_custom_target(doc
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            VERBATIM)
 else (DOXYGEN_FOUND)
-  message("Doxygen need to be installed to generate the doxygen documentation")
+    message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
+
+set(STARTUP_FILE ${CMAKE_SOURCE_DIR}/startup.pls)
+configure_file(${CMAKE_SOURCE_DIR}/startup_config.hpp.in ${CMAKE_BINARY_DIR}/startup_config.hpp)
+include_directories(${CMAKE_BINARY_DIR})
 

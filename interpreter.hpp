@@ -23,8 +23,9 @@ The parse method builds an internal AST.
 The eval method updates Environment and returns last result.
 */
 class Interpreter {
-public:
+ public:
 
+  Interpreter();
   /*! Parse into an internal Expression from a stream
     \param expression the raw text stream repreenting the candidate expression
     \return true on successful parsing 
@@ -37,7 +38,7 @@ public:
    */
   Expression evaluate();
 
-private:
+ private:
 
   // the environment
   Environment env;

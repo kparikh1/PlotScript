@@ -8,6 +8,7 @@
 #include "semantic_error.hpp"
 #include "interpreter.hpp"
 #include "expression.hpp"
+#include "startup_config.hpp"
 
 Expression run(const std::string &program) {
 
@@ -695,13 +696,13 @@ TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ 1 -2)",
-                                         "(+ -3 1 1)",
-                                         "(- 1)",
-                                         "(- 1 2)",
-                                         "(* 1 -1)",
-                                         "(* 1 1 -1)",
-                                         "(/ -1 1)",
-                                         "(/ 1 -1)"};
+        "(+ -3 1 1)",
+        "(- 1)",
+        "(- 1 2)",
+        "(* 1 -1)",
+        "(* 1 1 -1)",
+        "(/ -1 1)",
+        "(/ 1 -1)"};
 
     for (auto s : programs) {
       Expression result = run(s);
@@ -714,10 +715,10 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ -1 (- I))",
-                                         "(+ -3 1 1 (- I))",
-                                         "(- -1  I)",
-                                         "(* 1 (+ -1 (- I)))",
-                                         "(* 1 I I I I (+ -1 (- I)))",};
+        "(+ -3 1 1 (- I))",
+        "(- -1  I)",
+        "(* 1 (+ -1 (- I)))",
+        "(* 1 I I I I (+ -1 (- I)))",};
     std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
@@ -729,9 +730,9 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 TEST_CASE("Test some semantically invalid expresions", "[interpreter]") {
 
   std::vector<std::string> programs = {"(@ none)", // so such procedure
-                                       "(- 1 1 2)", // too many arguments
-                                       "(define begin 1)", // redefine special form
-                                       "(define pi 3.14)"}; // redefine builtin symbol
+      "(- 1 1 2)", // too many arguments
+      "(define begin 1)", // redefine special form
+      "(define pi 3.14)"}; // redefine builtin symbol
   for (auto s : programs) {
     Interpreter interp;
 
@@ -1403,4 +1404,58 @@ TEST_CASE("Test overwriting a property", "[interpreter]") {
   }
 }
 
-///
+/// Make-point, make-line, make-text Tests
+
+TEST_CASE("Test make-point", "[interpreter]") {
+  {
+    std::string program = "(begin (define p1 (make-point 1 2)) (get-property \"size\" p1))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(0.));
+  }
+  {
+    std::string program = "(begin (define p1 (make-point 1 2)) (get-property \"object-name\" p1))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("point", true));
+  }
+}
+
+TEST_CASE("Test make-line", "[interpreter]") {
+  {
+    std::string program =
+        "(begin (define p1 (make-point 1 2)) (define p2 (make-point 0 1)) (define l1 (make-line p1 p2)) (get-property \"object-name\" l1))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("line", true));
+  }
+  {
+    std::string program =
+        "(begin (define p1 (make-point 1 2)) (define p2 (make-point 0 1)) (define l1 (make-line p1 p2)) (get-property \"thickness\" l1))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression(1.));
+  }
+}
+
+TEST_CASE("Test make-text", "[interpreter]") {
+  {
+    std::string program =
+        "(begin (define t1 (make-text \"something\")) (get-property \"object-name\" t1))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression("text", true));
+  }
+  {
+    std::string program =
+        "(begin (define t1 (make-text \"something\")) (get-property \"position\" t1))";
+    INFO(program);
+    Expression result = run(program);
+    Expression t1;
+    t1.getTail().emplace_back(Expression(0.));
+    t1.getTail().emplace_back(Expression(0.));
+    REQUIRE(result == t1);
+  }
+}
+
+

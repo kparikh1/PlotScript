@@ -130,7 +130,7 @@ Expression pow(const std::vector<Expression> &args) {
   else if (args.cbegin()->isHeadNumCom() && args.at(1).isHeadNumCom()) {
     std::complex<double> comp = std::pow(args.cbegin()->head().getComplex(), args.at(1).head().getComplex());
     return (args.cbegin()->isHeadComplex() || args.at(1).isHeadComplex()) ? Expression(Atom(comp))
-                                                                          : Expression(Atom(comp.real()));
+        : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to exponent, argument not a number");
 };
@@ -350,58 +350,6 @@ Expression getProperty(const std::vector<Expression> &args) {
     throw SemanticError("Error: Invalid number of arguments in Get Properties");
 }
 
-Expression makePoint(const std::vector<Expression> &args) {
-  if (nargs_equal(args, 2) || (nargs_equal(args, 3))) {
-    Expression result;
-    result.getTail().emplace_back(*(args.cbegin()));
-    result.getTail().emplace_back(*(args.cbegin() + 1));
-    result.addProperty("object-name", Expression("point", true));
-    result.addProperty("size",
-                       ((nargs_equal(args, 3) && (args.cbegin() + 2)->isHeadNumber()
-                           && (args.cbegin() + 2)->head().asNumber() >= 0.0)) ? *(args.cbegin() + 2) : Expression(0.));
-    return result;
-  } else
-    throw SemanticError("Error: Invalid number of arguments to make-point");
-}
-
-Expression makeLine(const std::vector<Expression> &args) {
-  if (nargs_equal(args, 2) || nargs_equal(args, 3)) {
-    if ((args.cbegin())->isPoint()
-        && (args.cbegin() + 1)->isPoint()) {
-      Expression result;
-      result.getTail().emplace_back(*(args.cbegin()));
-      result.getTail().emplace_back(*(args.cbegin() + 1));
-      result.addProperty("object-name", Expression("line", true));
-      result.addProperty("thickness", (nargs_equal(args, 3)) ? *(args.cbegin() + 2) : Expression(1.));
-      return result;
-    } else
-      throw SemanticError("Error: make-line parameters are not points");
-
-  } else
-    throw SemanticError("Error: Invalid number of arguments to make-line");
-}
-
-Expression makeText(const std::vector<Expression> &args) {
-  if (nargs_equal(args, 1) || nargs_equal(args, 2)) {
-    if (args.cbegin()->head().isString()) {
-      if (nargs_equal(args, 2) && (args.cbegin() + 1)->isPoint()) {
-        Expression result = *(args.cbegin());
-        std::vector<Expression> xy;
-        xy.emplace_back(Expression(0.));
-        xy.emplace_back(Expression(0.));
-        Expression point = makePoint(xy);
-        result.addProperty("object-name", Expression("text", true));
-        result.addProperty("position", nargs_equal(args, 2) ? *(args.cbegin() + 1) : point);
-        return result;
-      } else
-        throw SemanticError("Error: Second argument to make-text is not a point");
-    } else
-      throw SemanticError("Error: First argument to make-text is not a string");
-  } else {
-    throw SemanticError("Error: Invalid number of arguments to make-text");
-  }
-}
-
 const
 double PI = std::atan2(0, -1);
 const double EXP = std::exp(1);
@@ -598,15 +546,6 @@ void Environment::reset() {
 
   // Procedure: get-property
   envmap.emplace("get-property", EnvResult(ProcedureType, getProperty));
-
-  // Procedure: make-point
-  envmap.emplace("make-point", EnvResult(ProcedureType, makePoint));
-
-  // Procedure: make-line
-  envmap.emplace("make-line", EnvResult(ProcedureType, makeLine));
-
-  // Procedure: make-line
-  envmap.emplace("make-text", EnvResult(ProcedureType, makeText));
 }
 
 Environment::Environment(const Environment &env) {

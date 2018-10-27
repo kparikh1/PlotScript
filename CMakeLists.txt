@@ -125,14 +125,14 @@ endif ()
 
 if (Qt5Widgets_FOUND AND Qt5Test_FOUND)
 
-    add_executable(notebook ${gui_main} ${gui_src})
+    add_executable(notebook ${gui_main} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets pthread)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets)
     endif ()
 
-    add_executable(notebook_test ${gui_test_src} ${gui_src})
+    add_executable(notebook_test ${gui_test_src} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test pthread)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)

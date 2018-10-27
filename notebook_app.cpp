@@ -2,10 +2,10 @@
 // Created by kishanp on 10/27/18.
 //
 #include "notebook_app.hpp"
-notebook_app::notebook_app() {
+NotebookApp::NotebookApp() {
 
-  input = new input_widget();
-  output = new output_widget();
+  input = new InputWidget();
+  output = new OutputWidget();
 
   auto layout = new QVBoxLayout();
 

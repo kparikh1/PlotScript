@@ -9,14 +9,14 @@
 #include "input_widget.hpp"
 #include "output_widget.hpp"
 
-class notebook_app : public QWidget {
+class NotebookApp : public QWidget {
  Q_OBJECT
  public:
-  notebook_app();
+  NotebookApp();
 
  private:
-  input_widget *input;
-  output_widget *output;
+  InputWidget *input;
+  OutputWidget *output;
 };
 
 #endif //PLOTSCRIPT_NOTEBOOK_APP_HPP

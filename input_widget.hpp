@@ -6,10 +6,10 @@
 #define PLOTSCRIPT_INPUT_WIDGET_HPP
 #include <QPlainTextEdit>
 
-class input_widget : public QPlainTextEdit {
+class InputWidget : public QPlainTextEdit {
  Q_OBJECT
  public:
-  input_widget() = default;
+  InputWidget() = default;
 
  private:
 };

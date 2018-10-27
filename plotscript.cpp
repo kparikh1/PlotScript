@@ -5,7 +5,6 @@
 
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
-#include "startup_config.hpp"
 
 void prompt() {
   std::cout << "\nplotscript> ";

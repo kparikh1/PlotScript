@@ -8,7 +8,6 @@
 #include "semantic_error.hpp"
 #include "interpreter.hpp"
 #include "expression.hpp"
-#include "startup_config.hpp"
 
 Expression run(const std::string &program) {
 

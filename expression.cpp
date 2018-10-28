@@ -405,6 +405,7 @@ bool Expression::operator==(const Expression &exp) const noexcept {
 
   return result;
 }
+
 bool Expression::isPoint() const noexcept {
   return this->getProperty("object-name") == Expression("point", true);
 }

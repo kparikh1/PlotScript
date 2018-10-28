@@ -7,12 +7,14 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
-class OutputWidget : public QGraphicsView, public QGraphicsScene {
+class OutputWidget : public QWidget {
 
  public:
-  OutputWidget() = default;
+  OutputWidget();
 
  private:
+  QGraphicsScene *scene;
+  QGraphicsView *view;
 
 };
 

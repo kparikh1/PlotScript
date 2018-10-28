@@ -5,7 +5,10 @@
 NotebookApp::NotebookApp() {
 
   input = new InputWidget();
+  input->setObjectName("input");
+
   output = new OutputWidget();
+  output->setObjectName("output");
 
   auto layout = new QVBoxLayout();
 

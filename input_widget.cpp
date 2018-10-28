@@ -3,3 +3,34 @@
 //
 
 #include "input_widget.hpp"
+#include "interpreter.hpp"
+#include "semantic_error.hpp"
+#include <QDebug>
+
+void InputWidget::keyPressEvent(QKeyEvent *event) {
+
+  if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) && event->modifiers() == Qt::ShiftModifier) {
+
+    std::string exception;
+
+    Interpreter interp;
+
+    std::istringstream input(toPlainText().toStdString());
+
+    if (!interp.parseStream(input)) {
+      exception = "Error: Invalid Program. Could not parse.";
+      qDebug() << "Error: Invalid Program. Could not parse.";
+      return;
+    }
+
+    try {
+      Expression result = interp.evaluate();
+    } catch (const SemanticError &error) {
+      exception = error.what();
+      qDebug() << error.what();
+    }
+  } else {
+    QPlainTextEdit::keyPressEvent(event);
+  }
+
+}

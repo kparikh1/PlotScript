@@ -3,3 +3,7 @@
 //
 
 #include "output_widget.hpp"
+
+OutputWidget::OutputWidget() {
+  ;
+}

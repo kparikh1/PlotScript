@@ -217,6 +217,19 @@ TEST_CASE("Test Interpreter result with simple procedures (div)", "[interpreter]
     Expression result = run(program);
     REQUIRE(result == Expression(2));
   }
+  {
+    std::string input = R"(
+(/ "string" 3)
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter]") {
@@ -244,6 +257,19 @@ TEST_CASE("Test Interpreter result with simple procedures (sqrt)", "[interpreter
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(std::complex<double>(1.0986841134678099, 0.4550898605622273))));
+  }
+  {
+    std::string input = R"(
+(sqrt "hello")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
 
 }
@@ -290,6 +316,19 @@ TEST_CASE("Test Interpreter result with simple procedures (exp)", "[interpreter]
     REQUIRE(
         result == Expression(Atom(std::complex<double>(-1., 0.))));
   }
+  {
+    std::string input = R"(
+(^ 2 "hi");
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (ln)", "[interpreter]") {
@@ -299,6 +338,19 @@ TEST_CASE("Test Interpreter result with simple procedures (ln)", "[interpreter]"
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(1.)));
+  }
+  {
+    std::string input = R"(
+(ln "hi")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
 }
 
@@ -310,6 +362,19 @@ TEST_CASE("Test Interpreter result with simple procedures (sin)", "[interpreter]
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(1.)));
   }
+  {
+    std::string input = R"(
+(sin "hi")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (cos)", "[interpreter]") {
@@ -320,6 +385,19 @@ TEST_CASE("Test Interpreter result with simple procedures (cos)", "[interpreter]
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(0.)));
   }
+  {
+    std::string input = R"(
+(cos "hi")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
+  }
 }
 
 TEST_CASE("Test Interpreter result with simple procedures (tan)", "[interpreter]") {
@@ -329,6 +407,19 @@ TEST_CASE("Test Interpreter result with simple procedures (tan)", "[interpreter]
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(Atom(0.)));
+  }
+  {
+    std::string input = R"(
+(tan "hi")
+)";
+
+    Interpreter interp;
+
+    std::istringstream iss(input);
+
+    bool ok = interp.parseStream(iss);
+    REQUIRE(ok);
+    REQUIRE_THROWS_AS(interp.evaluate(), SemanticError);
   }
 }
 
@@ -1418,6 +1509,12 @@ TEST_CASE("Test make-point", "[interpreter]") {
     Expression result = run(program);
     REQUIRE(result == Expression("point", true));
   }
+  {
+    std::string program = "(make-point 0 0)";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result.isPoint());
+  }
 }
 
 TEST_CASE("Test make-line", "[interpreter]") {
@@ -1434,6 +1531,12 @@ TEST_CASE("Test make-line", "[interpreter]") {
     INFO(program);
     Expression result = run(program);
     REQUIRE(result == Expression(1.));
+  }
+  {
+    std::string program = "(make-line (make-point 2 2) (make-point 0 0))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result.isLine());
   }
 }
 
@@ -1454,6 +1557,12 @@ TEST_CASE("Test make-text", "[interpreter]") {
     t1.getTail().emplace_back(Expression(0.));
     t1.getTail().emplace_back(Expression(0.));
     REQUIRE(result == t1);
+  }
+  {
+    std::string program = "(make-text \"Hi\")";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result.isText());
   }
 }
 

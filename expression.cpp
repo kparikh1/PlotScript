@@ -413,7 +413,7 @@ bool Expression::isLine() const noexcept {
   return this->getProperty("object-name") == Expression("line", true);
 }
 bool Expression::isText() const noexcept {
-  return this->getProperty("object-name") == Expression("true", true);
+  return this->getProperty("object-name") == Expression("text", true);
 }
 
 bool operator!=(const Expression &left, const Expression &right) noexcept {

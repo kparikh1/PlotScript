@@ -2,6 +2,7 @@
 // Created by kishanp on 10/27/18.
 //
 #include "notebook_app.hpp"
+
 NotebookApp::NotebookApp() {
 
   input = new InputWidget();

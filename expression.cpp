@@ -409,6 +409,12 @@ bool Expression::operator==(const Expression &exp) const noexcept {
 bool Expression::isPoint() const noexcept {
   return this->getProperty("object-name") == Expression("point", true);
 }
+bool Expression::isLine() const noexcept {
+  return this->getProperty("object-name") == Expression("line", true);
+}
+bool Expression::isText() const noexcept {
+  return this->getProperty("object-name") == Expression("true", true);
+}
 
 bool operator!=(const Expression &left, const Expression &right) noexcept {
 

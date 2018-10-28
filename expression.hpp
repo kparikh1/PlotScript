@@ -21,7 +21,7 @@ An expression is an atom called the head followed by a (possibly empty)
 list of expressions called the tail.
  */
 class Expression {
-public:
+ public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
@@ -96,6 +96,12 @@ public:
   /// convienience member to determine if the expression is a point
   bool isPoint() const noexcept;
 
+  /// convienience member to determine if the expression is a line
+  bool isLine() const noexcept;
+
+  /// convienience member to determine if the expression is a text
+  bool isText() const noexcept;
+
   /// Add a property to Expression
   void addProperty(const std::string &key, const Expression &value);
 
@@ -108,7 +114,7 @@ public:
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression &exp) const noexcept;
 
-private:
+ private:
 
   // the head of the expression
   Atom m_head;

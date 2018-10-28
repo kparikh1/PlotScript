@@ -27,9 +27,7 @@ void OutputWidget::printText(const std::string &text) {
 }
 void OutputWidget::outputExpression(const Expression &result) {
 
-  scene->destroyed();
-  scene = new QGraphicsScene();
-  view->setScene(scene);
+  scene->clear();
   if (result.isList() && isGraphic(result) && !result.isLine()) {
     for (auto &item:result.getTail()) {
       if (!showExpression(item)) {
@@ -46,8 +44,9 @@ bool OutputWidget::showExpression(const Expression &result) {
     return false;
   else if (result.isPoint()) {
     if (result.getProperty("size").isHeadNumber()) {
-      QGraphicsEllipseItem *point = scene->addEllipse((result.getTail().cbegin())->head().asNumber(),
-                                                      (result.getTail().cbegin() + 1)->head().asNumber(),
+      double offset = result.getProperty("size").head().asNumber() / 2;
+      QGraphicsEllipseItem *point = scene->addEllipse((result.getTail().cbegin())->head().asNumber() - offset,
+                                                      (result.getTail().cbegin() + 1)->head().asNumber() - offset,
                                                       result.getProperty("size").head().asNumber(),
                                                       result.getProperty("size").head().asNumber(),
                                                       QPen(Qt::black),

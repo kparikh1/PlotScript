@@ -28,7 +28,7 @@ void OutputWidget::printText(const std::string &text) {
 void OutputWidget::outputExpression(const Expression &result) {
 
   scene->clear();
-  if (result.isList() && !result.isPoint() && !result.isLine()) {
+  if (result.isList() && isGraphic(result)) {
     for (auto &item:result.getTail()) {
       if (!showExpression(item)) {
         return;
@@ -87,3 +87,11 @@ bool OutputWidget::showExpression(const Expression &result) {
   }
   return true;
 }
+bool OutputWidget::isGraphic(const Expression &input) {
+  for (auto &item:input.getTail()) {
+    if (item.isPoint() || item.isLine() || item.isText())
+      return true;
+  }
+  return false;
+}
+

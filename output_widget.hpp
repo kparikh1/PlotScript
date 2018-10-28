@@ -20,6 +20,7 @@ class OutputWidget : public QWidget {
   QGraphicsView *view;
 
   bool showExpression(const Expression &result);
+  bool isGraphic(const Expression &input);
 
  public slots:
   void printText(const std::string &text);

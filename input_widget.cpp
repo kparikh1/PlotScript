@@ -18,16 +18,15 @@ void InputWidget::keyPressEvent(QKeyEvent *event) {
     std::istringstream input(toPlainText().toStdString());
 
     if (!interp.parseStream(input)) {
-      exception = "Error: Invalid Program. Could not parse.";
-      qDebug() << "Error: Invalid Program. Could not parse.";
+      emit exceptionThrown("Error: Invalid Program. Could not parse.");
       return;
     }
 
     try {
       Expression result = interp.evaluate();
+      emit sendResult(result);
     } catch (const SemanticError &error) {
-      exception = error.what();
-      qDebug() << error.what();
+      emit exceptionThrown(error.what());
     }
   } else {
     QPlainTextEdit::keyPressEvent(event);

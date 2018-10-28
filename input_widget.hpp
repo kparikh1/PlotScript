@@ -5,6 +5,8 @@
 #ifndef PLOTSCRIPT_INPUT_WIDGET_HPP
 #define PLOTSCRIPT_INPUT_WIDGET_HPP
 #include <QPlainTextEdit>
+#include "expression.hpp"
+#include <string>
 
 class InputWidget : public QPlainTextEdit {
  Q_OBJECT
@@ -12,6 +14,11 @@ class InputWidget : public QPlainTextEdit {
   InputWidget() = default;
 
   void keyPressEvent(QKeyEvent *event) override;
+
+ signals:
+
+  void exceptionThrown(const std::string &exception);
+  void sendResult(const Expression &result);
 
  private:
 };

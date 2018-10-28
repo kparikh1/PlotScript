@@ -10,6 +10,9 @@ NotebookApp::NotebookApp() {
   output = new OutputWidget();
   output->setObjectName("output");
 
+  connect(input, &InputWidget::exceptionThrown, output, &OutputWidget::printText);
+  connect(input, &InputWidget::sendResult, output, &OutputWidget::outputExpression);
+
   auto layout = new QVBoxLayout();
 
   layout->addWidget(input);

@@ -6,6 +6,9 @@
 #define PLOTSCRIPT_OUTPUT_WIDGET_HPP
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QVBoxLayout>
+#include <string>
+#include "expression.hpp"
 
 class OutputWidget : public QWidget {
 
@@ -16,6 +19,9 @@ class OutputWidget : public QWidget {
   QGraphicsScene *scene;
   QGraphicsView *view;
 
+ public slots:
+  void printText(const std::string &text);
+  void outputExpression(const Expression &result);
 };
 
 #endif //PLOTSCRIPT_OUTPUT_WIDGET_HPP

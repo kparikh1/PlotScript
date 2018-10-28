@@ -27,11 +27,23 @@ void OutputWidget::printText(const std::string &text) {
 }
 void OutputWidget::outputExpression(const Expression &result) {
 
+  scene->clear();
+  if (result.isList() && !result.isPoint() && !result.isLine()) {
+    for (auto &item:result.getTail()) {
+      if (!showExpression(item)) {
+        return;
+      }
+    }
+  } else {
+    showExpression(result);
+  }
+
+}
+bool OutputWidget::showExpression(const Expression &result) {
   if (result.isLambda())
-    return;
+    return false;
   else if (result.isPoint()) {
     if (result.getProperty("size").isHeadNumber()) {
-      scene->clear();
       QGraphicsEllipseItem *point = scene->addEllipse((result.getTail().cbegin())->head().asNumber(),
                                                       (result.getTail().cbegin() + 1)->head().asNumber(),
                                                       result.getProperty("size").head().asNumber(),
@@ -41,10 +53,10 @@ void OutputWidget::outputExpression(const Expression &result) {
       point->setVisible(true);
     } else {
       printText("Error: make-point size not a positive number");
+      return false;
     }
   } else if (result.isLine()) {
     if (result.getProperty("thickness").isHeadNumber()) {
-      scene->clear();
       QGraphicsLineItem *line = scene->addLine((result.getTail().cbegin())->getTail().cbegin()->head().asNumber(),
                                                (result.getTail().cbegin()->getTail().cbegin() + 1)->head().asNumber(),
                                                ((result.getTail().cbegin() + 1)->getTail().cbegin())->head().asNumber(),
@@ -55,13 +67,23 @@ void OutputWidget::outputExpression(const Expression &result) {
       line->setVisible(true);
     } else {
       printText(("Error: make-line thickness not a number"));
+      return false;
     }
+  } else if (result.isText()) {
+    if (result.getProperty("position").isPoint()) {
+      QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(result.head().asString()));
+      textItem->setPos(result.getProperty("position").getTail().cbegin()->head().asNumber(),
+                       (result.getProperty("position").getTail().cbegin() + 1)->head().asNumber());
+    } else {
+      printText("Error: make-text position not a point");
+      return false;
+    }
+
   } else {
     std::stringstream iss;
     iss << result;
-    scene->clear();
     QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(iss.str()));
     textItem->setPos(0, 0);
   }
-
+  return true;
 }

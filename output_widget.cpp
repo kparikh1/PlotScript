@@ -27,8 +27,10 @@ void OutputWidget::printText(const std::string &text) {
 }
 void OutputWidget::outputExpression(const Expression &result) {
 
-  scene->clear();
-  if (result.isList() && isGraphic(result)) {
+  scene->destroyed();
+  scene = new QGraphicsScene();
+  view->setScene(scene);
+  if (result.isList() && isGraphic(result) && !result.isLine()) {
     for (auto &item:result.getTail()) {
       if (!showExpression(item)) {
         return;

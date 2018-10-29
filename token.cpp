@@ -21,9 +21,11 @@ Token::TokenType Token::type() const {
 
 std::string Token::asString() const {
   switch (m_type) {
-    case OPEN:return "(";
-    case CLOSE:return ")";
-    case STRING:return value;
+  case OPEN:return "(";
+  case CLOSE:return ")";
+  case STRINGOPEN: return "\"";
+  case STRINGCLOSE: return "\"";
+  case STRING:return value;
   }
   return "";
 }
@@ -42,14 +44,16 @@ TokenSequenceType tokenize(std::istream &seq) {
 
   while (true) {
     char c = (char) seq.get();
-    if (seq.eof()) break;
+    if (seq.eof())
+      break;
 
     if (c == COMMENTCHAR) {
       // chomp until the end of the line
       while ((!seq.eof()) && (c != '\n')) {
         c = (char) seq.get();
       }
-      if (seq.eof()) break;
+      if (seq.eof())
+        break;
     } else if (c == STRINGCHAR) {
       store_ifnot_empty(token, tokens);
       tokens.push_back(Token::TokenType::STRINGOPEN);

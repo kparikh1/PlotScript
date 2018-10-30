@@ -100,10 +100,10 @@ class Atom {
   };
 
   // helper to set type and value of Number
-  void setNumber(double value);
-
-  // helper to set type and value of None
   void setNone();
+
+  // helper to set type and value of Number
+  void setNumber(double value);
 
   // helper to set type and value of Symbol
   void setSymbol(const std::string &value);

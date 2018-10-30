@@ -107,8 +107,9 @@ Atom::~Atom() {
 }
 
 void Atom::Clear() {
-  setNone();
-
+  setComplex(std::complex<double>(0, 0));
+  setSymbol("");
+  m_type = NoneKind;
 };
 
 bool Atom::isNone() const noexcept {
@@ -198,35 +199,36 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-    case NoneKind:
-      if (right.m_type != NoneKind)
-        return false;
-      break;
-    case NumberKind: {
-      if (right.m_type != NumberKind)
-        return false;
-      if (Epsilon(complexValue.real(), right.complexValue.real()))
-        return false;
-    }
-      break;
-    case ComplexKind: {
-      if (right.m_type != ComplexKind ||
-          Epsilon(complexValue.real(), right.complexValue.real())
-          || Epsilon(complexValue.imag(), right.complexValue.imag()))
-        return false;
-    }
-      break;
-    case SymbolKind: {
-      if (right.m_type != SymbolKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-    case StringKind: {
-      if (right.m_type != StringKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-    default:return false;
+  case NoneKind:
+    if (right.m_type != NoneKind)
+      return false;
+    break;
+  case NumberKind: {
+    if (right.m_type != NumberKind)
+      return false;
+    if (Epsilon(complexValue.real(), right.complexValue.real()))
+      return false;
+  }
+    break;
+  case ComplexKind: {
+    if (right.m_type != ComplexKind ||
+        Epsilon(complexValue.real(), right.complexValue.real())
+        || Epsilon(complexValue.imag(), right.complexValue.imag()))
+      return false;
+  }
+    break;
+  case SymbolKind: {
+    if (right.m_type != SymbolKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+  case StringKind: {
+    if (right.m_type != StringKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+    break;
+  default:return false;
   }
 
   return true;

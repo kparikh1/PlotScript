@@ -15,6 +15,7 @@ class NotebookTest : public QObject {
   void testBasicPoint();
   void testBasicLine();
   void testBasicText();
+  void testDefaultLine();
 
  private:
   InputWidget *input;
@@ -31,6 +32,7 @@ void NotebookTest::initTestCase() {
   output = notebook->findChild<OutputWidget *>("output");
   view = output->findChild<QGraphicsView *>();
   scene = view->scene();
+  notebook->show();
 }
 
 void NotebookTest::objectNames() {
@@ -104,6 +106,23 @@ void NotebookTest::testBasicText() {
 
   QVERIFY2(result->pos().toPoint() == QPoint(2, 4), "Invalid point");
   QVERIFY2(result->toPlainText() == QString(QString::fromStdString("Hi")), "Invalid text outputted");
+}
+
+void NotebookTest::testDefaultLine() {
+  std::string inputText = "(make-line (make-point 0 0) (make-point 3 2))";
+  input->setPlainText(QString::fromStdString(inputText));
+
+  QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::ShiftModifier);
+  input->keyPressEvent(event);
+
+  auto graphicsObjects = scene->items();
+
+  auto result = (QGraphicsLineItem *) *graphicsObjects.cbegin();
+  QPen pen(QBrush(Qt::black, Qt::SolidPattern), 1);
+
+  QVERIFY2(result->line().toLine() == QLine(0, 0, 3, 2), "Invalid Line");
+  QVERIFY2(result->pen() == pen, "Invalid line thickness");
+
 }
 
 QTEST_MAIN(NotebookTest)

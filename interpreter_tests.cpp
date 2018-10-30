@@ -1455,6 +1455,13 @@ TEST_CASE("Test getting a property", "[interpreter]") {
     REQUIRE(result == Expression("a complex number", true));
   }
   {
+    std::string program =
+        "(begin (define a (+ 1 I)) (define b (set-property \"note\" \"a complex number\" a)) (get-property \"note\" b) (get-property \"foo\" b))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result == Expression());
+  }
+  {
     std::string input = R"(
 (begin (define a (+ 1 I)) (define b (set-property \"note\" \"a complex number\" a)) (get-property \"foo\" b))
 )";

@@ -84,7 +84,7 @@ Atom &Atom::operator=(const Atom &x) {
 
   if (this != &x) {
     if (x.m_type == NoneKind) {
-      m_type = NoneKind;
+      setNone();
     } else if (x.m_type == NumberKind) {
       setNumber(x.complexValue.real());
     } else if (x.m_type == SymbolKind) {
@@ -107,9 +107,8 @@ Atom::~Atom() {
 }
 
 void Atom::Clear() {
-  setComplex(std::complex<double>(0, 0));
-  setSymbol("");
-  m_type = NoneKind;
+  setNone();
+
 };
 
 bool Atom::isNone() const noexcept {
@@ -199,36 +198,35 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-  case NoneKind:
-    if (right.m_type != NoneKind)
-      return false;
-    break;
-  case NumberKind: {
-    if (right.m_type != NumberKind)
-      return false;
-    if (Epsilon(complexValue.real(), right.complexValue.real()))
-      return false;
-  }
-    break;
-  case ComplexKind: {
-    if (right.m_type != ComplexKind ||
-        Epsilon(complexValue.real(), right.complexValue.real())
-        || Epsilon(complexValue.imag(), right.complexValue.imag()))
-      return false;
-  }
-    break;
-  case SymbolKind: {
-    if (right.m_type != SymbolKind)
-      return false;
-    return stringValue == right.stringValue;
-  }
-  case StringKind: {
-    if (right.m_type != StringKind)
-      return false;
-    return stringValue == right.stringValue;
-  }
-    break;
-  default:return false;
+    case NoneKind:
+      if (right.m_type != NoneKind)
+        return false;
+      break;
+    case NumberKind: {
+      if (right.m_type != NumberKind)
+        return false;
+      if (Epsilon(complexValue.real(), right.complexValue.real()))
+        return false;
+    }
+      break;
+    case ComplexKind: {
+      if (right.m_type != ComplexKind ||
+          Epsilon(complexValue.real(), right.complexValue.real())
+          || Epsilon(complexValue.imag(), right.complexValue.imag()))
+        return false;
+    }
+      break;
+    case SymbolKind: {
+      if (right.m_type != SymbolKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+    case StringKind: {
+      if (right.m_type != StringKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+    default:return false;
   }
 
   return true;
@@ -247,6 +245,11 @@ void Atom::setString(const std::string &value) {
 
   // copy construct in place
   new(&stringValue) std::string(value);
+}
+void Atom::setNone() {
+  if (m_type == SymbolKind || m_type == StringKind)
+    stringValue.~basic_string();
+  m_type = NoneKind;
 }
 
 bool operator!=(const Atom &left, const Atom &right) noexcept {

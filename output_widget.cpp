@@ -77,7 +77,7 @@ bool OutputWidget::showExpression(const Expression &result) {
       textItem->setPos(
           result.getProperty("position").getTail().cbegin()->head().asNumber() - textItem->boundingRect().width() / 2,
           (result.getProperty("position").getTail().cbegin() + 1)->head().asNumber()
-              + textItem->boundingRect().height() / 2);
+              - textItem->boundingRect().height() / 2);
     } else {
       printText("Error: make-text position not a point");
       return false;
@@ -89,7 +89,7 @@ bool OutputWidget::showExpression(const Expression &result) {
     QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(iss.str()));
     textItem->setPos(0, 0);
   }
-  
+
   view->fitInView(0, 0, scene->width(), scene->height(), Qt::KeepAspectRatio);
   return true;
 }

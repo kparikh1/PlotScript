@@ -93,6 +93,7 @@ bool OutputWidget::showExpression(const Expression &result) {
   view->fitInView(0, 0, scene->width(), scene->height(), Qt::KeepAspectRatio);
   return true;
 }
+
 bool OutputWidget::isGraphic(const Expression &input) {
   for (auto &item:input.getTail()) {
     if (item.isPoint() || item.isLine() || item.isText())
@@ -100,6 +101,7 @@ bool OutputWidget::isGraphic(const Expression &input) {
   }
   return false;
 }
+
 void OutputWidget::resizeEvent(QResizeEvent *event) {
   QWidget::resizeEvent(event);
 

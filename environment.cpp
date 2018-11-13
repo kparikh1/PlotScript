@@ -337,7 +337,7 @@ Expression setProperty(const std::vector<Expression> &args) {
   } else {
     throw SemanticError("Error: Invalid number of arguements in Set Properties");
   }
-}
+};
 
 Expression getProperty(const std::vector<Expression> &args) {
   if (nargs_equal(args, 2)) {
@@ -348,7 +348,11 @@ Expression getProperty(const std::vector<Expression> &args) {
       throw SemanticError("Error: First Argument not a string");
   } else
     throw SemanticError("Error: Invalid number of arguments in Get Properties");
-}
+};
+
+Expression discretePlot(const std::vector<Expression> &args) {
+  return *args.cbegin();
+};
 
 const
 double PI = std::atan2(0, -1);
@@ -546,6 +550,9 @@ void Environment::reset() {
 
   // Procedure: get-property
   envmap.emplace("get-property", EnvResult(ProcedureType, getProperty));
+
+  // Procedure: discrete-plot
+  envmap.emplace("discrete-plot", EnvResult(ProcedureType, discretePlot));
 }
 
 Environment::Environment(const Environment &env) {

@@ -1573,4 +1573,14 @@ TEST_CASE("Test make-text", "[interpreter]") {
   }
 }
 
+/// Discrete Plot
+
+TEST_CASE("Test descrete-plot", "[interpreter]") {
+  {
+    std::string program =
+        "(begin (define f (lambda (x) (list x (+ (* 2 x) 1)))) (discrete-plot (map f (range -2 2 0.5)) (list (list \"title\" \"The Data\") (list \"abscissa-label\" \"X Label\") (list \"ordinate-label\" \"Y Label\") (list \"text-scale\" 1))))";
+    INFO(program);
+    Expression result = run(program);
+  }
+}
 

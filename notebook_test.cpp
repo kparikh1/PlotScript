@@ -32,7 +32,6 @@ void NotebookTest::initTestCase() {
   output = notebook->findChild<OutputWidget *>("output");
   view = output->findChild<QGraphicsView *>();
   scene = view->scene();
-  notebook->show();
 }
 
 void NotebookTest::objectNames() {
@@ -94,7 +93,7 @@ void NotebookTest::testBasicLine() {
 }
 
 void NotebookTest::testBasicText() {
-  std::string inputText = "(set-property \"position\" (make-point 2 4) (make-text \"Hi\" ) )";
+  std::string inputText = "(set-property \"position\" (make-point 2 4) (make-text \"Hello World\" ) )";
   input->setPlainText(QString::fromStdString(inputText));
 
   QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::ShiftModifier);
@@ -104,8 +103,8 @@ void NotebookTest::testBasicText() {
 
   auto result = (QGraphicsTextItem *) *graphicsObjects.cbegin();
 
-  QVERIFY2(result->pos().toPoint() == QPoint(2, 4), "Invalid point");
-  QVERIFY2(result->toPlainText() == QString(QString::fromStdString("Hi")), "Invalid text outputted");
+  QVERIFY2(result->pos().toPoint() == QPoint(-48, 19), "Invalid point");
+  QVERIFY2(result->toPlainText() == QString(QString::fromStdString("Hello World")), "Invalid text outputted");
 }
 
 void NotebookTest::testDefaultLine() {

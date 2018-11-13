@@ -15,6 +15,8 @@ class OutputWidget : public QWidget {
  public:
   OutputWidget();
 
+  void resizeEvent(QResizeEvent *event) override;
+
  private:
   QGraphicsScene *scene;
   QGraphicsView *view;

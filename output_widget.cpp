@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QString>
 #include <QtWidgets/QGraphicsTextItem>
+#include <QtGui/QResizeEvent>
 
 OutputWidget::OutputWidget() {
 
@@ -73,8 +74,10 @@ bool OutputWidget::showExpression(const Expression &result) {
   } else if (result.isText()) {
     if (result.getProperty("position").isPoint()) {
       QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(result.head().asString()));
-      textItem->setPos(result.getProperty("position").getTail().cbegin()->head().asNumber(),
-                       (result.getProperty("position").getTail().cbegin() + 1)->head().asNumber());
+      textItem->setPos(
+          result.getProperty("position").getTail().cbegin()->head().asNumber() - textItem->boundingRect().width() / 2,
+          (result.getProperty("position").getTail().cbegin() + 1)->head().asNumber()
+              + textItem->boundingRect().height() / 2);
     } else {
       printText("Error: make-text position not a point");
       return false;
@@ -86,6 +89,8 @@ bool OutputWidget::showExpression(const Expression &result) {
     QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(iss.str()));
     textItem->setPos(0, 0);
   }
+  
+  view->fitInView(0, 0, scene->width(), scene->height(), Qt::KeepAspectRatio);
   return true;
 }
 bool OutputWidget::isGraphic(const Expression &input) {
@@ -94,5 +99,10 @@ bool OutputWidget::isGraphic(const Expression &input) {
       return true;
   }
   return false;
+}
+void OutputWidget::resizeEvent(QResizeEvent *event) {
+  QWidget::resizeEvent(event);
+
+  view->fitInView(0, 0, scene->width(), scene->height(), Qt::KeepAspectRatio);
 }
 

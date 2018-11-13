@@ -103,7 +103,7 @@ void NotebookTest::testBasicText() {
 
   auto result = (QGraphicsTextItem *) *graphicsObjects.cbegin();
 
-  QVERIFY2(result->pos().toPoint() == QPoint(-48, 19), "Invalid point");
+  QVERIFY2(result->pos().toPoint() == QPoint(-48, -10), "Invalid point");
   QVERIFY2(result->toPlainText() == QString(QString::fromStdString("Hello World")), "Invalid text outputted");
 }
 

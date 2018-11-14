@@ -48,6 +48,19 @@ class Expression {
   /// Construct Expression with complex
   explicit Expression(const std::complex<double> &value);
 
+  /// Construct Expression as point
+  explicit Expression(const double &x, const double &y, const double &size);
+
+  /// Construct Expression as Line
+  explicit Expression(const double &x1, const double &y1, const double &x2, const double &y2, const double &thickness);
+
+  /// Construct Expression as text
+  explicit Expression(const std::string &text,
+                      const double &x,
+                      const double &y,
+                      const double &scale,
+                      const double &rotation);
+
   /// deep-copy assign an expression  (recursive)
   Expression &operator=(const Expression &a);
 

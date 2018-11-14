@@ -310,6 +310,13 @@ Expression Expression::handle_map(Environment &env) {
   if (!(m_tail.cbegin() + 1)->isList())
     throw SemanticError("Error: Second argument to map not a list");
 
+  if ((m_tail.cbegin() + 1)->isHeadSymbol()
+      && (env.is_proc((m_tail.cbegin() + 1)->head()) || env.is_known((m_tail.cbegin() + 1)->head()))) {
+    Expression Evaluate = *(m_tail.cbegin() + 1);
+    m_tail.pop_back();
+    m_tail.emplace_back(Evaluate.eval(env));
+  }
+
   Expression result;
   Expression entry = Expression(m_tail.cbegin()->head());
   for (auto a:(m_tail.cbegin() + 1)->getTail()) {
@@ -414,6 +421,39 @@ bool Expression::isLine() const noexcept {
 }
 bool Expression::isText() const noexcept {
   return this->getProperty("object-name") == Expression("text", true);
+}
+
+Expression::Expression(const double &x, const double &y, const double &size) {
+  m_tail.emplace_back(Expression(x));
+  m_tail.emplace_back(Expression(y));
+
+  addProperty("size", Expression(size));
+  addProperty("object-name", Expression("point", true));
+}
+
+Expression::Expression(const double &x1,
+                       const double &y1,
+                       const double &x2,
+                       const double &y2,
+                       const double &thickness) {
+
+  m_tail.emplace_back(Expression(x1, y1, 0));
+  m_tail.emplace_back(Expression(x2, y2, 0));
+
+  addProperty("thickness", Expression(thickness));
+  addProperty("object-name", Expression("line", true));
+}
+Expression::Expression(const std::string &text,
+                       const double &x,
+                       const double &y,
+                       const double &scale,
+                       const double &rotation) {
+
+  m_head = Atom(text, true);
+  addProperty("object-name", Expression("text", true));
+  addProperty("position", Expression(x, y, 0));
+  addProperty("text-scale", Expression(scale));
+  addProperty("text-rotation", Expression(rotation));
 }
 
 bool operator!=(const Expression &left, const Expression &right) noexcept {

@@ -78,6 +78,11 @@ bool OutputWidget::showExpression(const Expression &result) {
           result.getProperty("position").getTail().cbegin()->head().asNumber() - textItem->boundingRect().width() / 2,
           (result.getProperty("position").getTail().cbegin() + 1)->head().asNumber()
               - textItem->boundingRect().height() / 2);
+      textItem->setTransformOriginPoint(textItem->boundingRect().width() / 2, textItem->boundingRect().height() / 2);
+      if (result.getProperty("text-scale").isHeadNumber())
+        textItem->setScale(result.getProperty("text-scale").head().asNumber());
+      if (result.getProperty("text-rotation").isHeadNumber())
+        textItem->setRotation(result.getProperty("text-rotation").head().asNumber() * 180 / std::atan2(0, -1));
     } else {
       printText("Error: make-text position not a point");
       return false;

@@ -378,9 +378,6 @@ Expression discretePlot(const std::vector<Expression> &args) {
   if (!args.cbegin()->isList() || !(args.cbegin() + 1)->isList())
     throw SemanticError("Error: Invalid type of argument to discrete-plot");
 
-  if ((args.cbegin() + 1)->getTail().size() != 4)
-    throw SemanticError("Error: Invalid number of options to discrete-plot");
-
   std::string title, abscLabel, ordLabel;
   double textScale = 1;
   for (auto &option:(args.cbegin() + 1)->getTail()) {

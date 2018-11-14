@@ -50,7 +50,7 @@ bool OutputWidget::showExpression(const Expression &result) {
                                                       (result.getTail().cbegin() + 1)->head().asNumber() - offset,
                                                       result.getProperty("size").head().asNumber(),
                                                       result.getProperty("size").head().asNumber(),
-                                                      QPen(Qt::black),
+                                                      QPen(Qt::NoPen),
                                                       QBrush(Qt::black, Qt::SolidPattern));
       point->setVisible(true);
     } else {

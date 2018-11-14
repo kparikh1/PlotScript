@@ -337,30 +337,16 @@ Expression Expression::handle_map(Environment &env) {
 
 Expression Expression::handle_continuousPlot(Environment &env) {
 
-  if (m_tail.size() != 3)
+  if (m_tail.size() >= 2)
     throw SemanticError("Error: Invalid number of parameters to continuous-plot");
 
-  if (!(m_tail.cbegin() + 1)->isList() || !(m_tail.cbegin() + 2)->isList())
+  if (!(m_tail.cbegin() + 1)->isList())
     throw SemanticError("Error: Invalid type of argument to continuous-plot");
 
   /// Deconstruct Parameters
   Expression lambdaFunction = *m_tail.cbegin();
   Expression arguments = (m_tail.begin() + 1)->eval(env);
-  Expression properties = (m_tail.begin() + 2)->eval(env);
 
-  /// Get Properties
-  std::string title, abscLabel, ordLabel;
-  double textScale = 1;
-  for (auto &option:properties.getTail()) {
-    if (option.getTail().cbegin()->head().asString() == "title")
-      title = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "abscissa-label")
-      abscLabel = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "ordinate-label")
-      ordLabel = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "text-scale")
-      textScale = (option.getTail().cbegin() + 1)->head().asNumber();
-  }
 
   /// Create Data
   double stepSize =
@@ -426,15 +412,32 @@ Expression Expression::handle_continuousPlot(Environment &env) {
   if (inGraph)
     result.getTail().emplace_back(Expression(xMax, 0, xMin, 0, 0));
 
-  /// Add Graph Labels
-  result.getTail().emplace_back(Expression(title, xMax - ((xMax - xMin) / 2), (yMax - 3), textScale, 0));
-  result.getTail().emplace_back(Expression(abscLabel, xMax - ((xMax - xMin) / 2), (yMin + 3), textScale, 0));
-  result.getTail().emplace_back(Expression(ordLabel,
-                                           (xMin - 3),
-                                           yMin - (yMin - yMax) / 2,
-                                           textScale,
-                                           -std::atan2(0, -1) / 2));
+  double textScale = 1;
+  if (m_tail.size() == 3 && (m_tail.cbegin()+2)->isList()) {
+    Expression properties = (m_tail.begin() + 2)->eval(env);
 
+    /// Get Properties
+    std::string title, abscLabel, ordLabel;
+    for (auto &option:properties.getTail()) {
+      if (option.getTail().cbegin()->head().asString() == "title")
+        title = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "abscissa-label")
+        abscLabel = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "ordinate-label")
+        ordLabel = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "text-scale")
+        textScale = (option.getTail().cbegin() + 1)->head().asNumber();
+    }
+
+    /// Add Graph Labels
+    result.getTail().emplace_back(Expression(title, xMax - ((xMax - xMin) / 2), (yMax - 3), textScale, 0));
+    result.getTail().emplace_back(Expression(abscLabel, xMax - ((xMax - xMin) / 2), (yMin + 3), textScale, 0));
+    result.getTail().emplace_back(Expression(ordLabel,
+                                             (xMin - 3),
+                                             yMin - (yMin - yMax) / 2,
+                                             textScale,
+                                             -std::atan2(0, -1) / 2));
+  }
   /// Add Graph number labels
   std::stringstream ss;
   ss << std::setprecision(2);

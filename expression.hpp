@@ -21,7 +21,7 @@ An expression is an atom called the head followed by a (possibly empty)
 list of expressions called the tail.
  */
 class Expression {
- public:
+public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
@@ -127,7 +127,7 @@ class Expression {
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression &exp) const noexcept;
 
- private:
+private:
 
   // the head of the expression
   Atom m_head;
@@ -152,6 +152,7 @@ class Expression {
   Expression handle_lambda();
   Expression handle_apply(Environment &env);
   Expression handle_map(Environment &env);
+  Expression handle_continuousPlot(Environment &env);
 };
 
 /// Render expression to output stream
@@ -159,5 +160,8 @@ std::ostream &operator<<(std::ostream &out, const Expression &exp);
 
 /// inequality comparison for two expressions (recursive)
 bool operator!=(const Expression &left, const Expression &right) noexcept;
+
+/// Creates the scalefactor for the graphs and gets their Min and Max
+double scaleFactor(const std::vector<double> &positions, double &max, double &min);
 
 #endif

@@ -16,25 +16,6 @@ bool nargs_equal(const std::vector<Expression> &args, unsigned nargs) {
   return args.size() == nargs;
 }
 
-// Returns Scale Factor
-double scaleFactor(const std::vector<double> &positions, double &max, double &min) {
-
-  max = *positions.cbegin();
-  min = *positions.cbegin();
-  for (auto &pos:positions) {
-    if (max < pos)
-      max = pos;
-    if (min > pos)
-      min = pos;
-  }
-
-  double scaleFact = 20 / (max - min);
-  max *= scaleFact;
-  min *= scaleFact;
-
-  return scaleFact;
-};
-
 /*********************************************************************** 
 Each of the functions below have the signature that corresponds to the
 typedef'd Procedure function pointer.
@@ -150,7 +131,7 @@ Expression pow(const std::vector<Expression> &args) {
   else if (args.cbegin()->isHeadNumCom() && args.at(1).isHeadNumCom()) {
     std::complex<double> comp = std::pow(args.cbegin()->head().getComplex(), args.at(1).head().getComplex());
     return (args.cbegin()->isHeadComplex() || args.at(1).isHeadComplex()) ? Expression(Atom(comp))
-        : Expression(Atom(comp.real()));
+                                                                          : Expression(Atom(comp.real()));
   } else
     throw SemanticError("Error in call to exponent, argument not a number");
 };

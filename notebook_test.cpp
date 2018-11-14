@@ -81,9 +81,9 @@ int intersectsLine(QGraphicsScene *scene, QPointF center, qreal radius) {
 }
 
 class NotebookTest : public QObject {
- Q_OBJECT
+Q_OBJECT
 
- private slots:
+private slots:
 
   void initTestCase();
 
@@ -95,8 +95,9 @@ class NotebookTest : public QObject {
   void testBasicText();
   void testDefaultLine();
   void testDiscretePlotLayout();
+  void testContinuousPlotLayout();
 
- private:
+private:
   InputWidget *input;
   OutputWidget *output;
   QGraphicsView *view;
@@ -182,7 +183,10 @@ void NotebookTest::testBasicText() {
 
   auto result = (QGraphicsTextItem *) *graphicsObjects.cbegin();
 
-  QVERIFY2(result->pos().toPoint() == QPoint(-48, -10), "Invalid point");
+  //int x = result->pos().toPoint().x();
+  //int y = result->pos().toPoint().y();
+
+  QVERIFY2(result->pos().toPoint() == QPoint(-33, -8), "Invalid point");
   QVERIFY2(result->toPlainText() == QString(QString::fromStdString("Hello World")), "Invalid text outputted");
 }
 
@@ -284,6 +288,20 @@ void NotebookTest::testDiscretePlotLayout() {
 
   // check the point at (1,1)
   QCOMPARE(findPoints(scene, QPointF(10, -10), 0.6), 1);
+}
+
+void NotebookTest::testContinuousPlotLayout() {
+  std::string program = R"((begin
+    (define f (lambda (x)
+        (+ (* 2 x) 1)))
+    (continuous-plot f (list -2 2)
+        (list
+        (list "title" "A continuous linear function")
+        (list "abscissa-label" "x")
+        (list "ordinate-label" "y"))))
+)";
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
 }
 
 QTEST_MAIN(NotebookTest)

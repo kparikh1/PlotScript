@@ -3,6 +3,7 @@
 #include <sstream>
 #include <list>
 #include <string>
+#include <iomanip>
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
@@ -334,6 +335,134 @@ Expression Expression::handle_map(Environment &env) {
 
 }
 
+Expression Expression::handle_continuousPlot(Environment &env) {
+
+  if (m_tail.size() != 3)
+    throw SemanticError("Error: Invalid number of parameters to continuous-plot");
+
+  if (!(m_tail.cbegin() + 1)->isList() || !(m_tail.cbegin() + 2)->isList())
+    throw SemanticError("Error: Invalid type of argument to continuous-plot");
+
+  /// Deconstruct Parameters
+  Expression lambdaFunction = *m_tail.cbegin();
+  Expression arguments = (m_tail.begin() + 1)->eval(env);
+  Expression properties = (m_tail.begin() + 2)->eval(env);
+
+  /// Get Properties
+  std::string title, abscLabel, ordLabel;
+  double textScale = 1;
+  for (auto &option:properties.getTail()) {
+    if (option.getTail().cbegin()->head().asString() == "title")
+      title = (option.getTail().cbegin() + 1)->head().asString();
+    else if (option.getTail().cbegin()->head().asString() == "abscissa-label")
+      abscLabel = (option.getTail().cbegin() + 1)->head().asString();
+    else if (option.getTail().cbegin()->head().asString() == "ordinate-label")
+      ordLabel = (option.getTail().cbegin() + 1)->head().asString();
+    else if (option.getTail().cbegin()->head().asString() == "text-scale")
+      textScale = (option.getTail().cbegin() + 1)->head().asNumber();
+  }
+
+  /// Create Data
+  double stepSize =
+      (arguments.getTail().cbegin()->head().asNumber() - (arguments.getTail().cbegin() + 1)->head().asNumber()) / -50;
+  arguments.getTail().emplace_back(Expression(stepSize));
+  Expression xPositionsExpressions("range");
+  xPositionsExpressions.getTail()
+      .insert(xPositionsExpressions.getTail().end(), arguments.getTail().begin(), arguments.getTail().end());
+  xPositionsExpressions = xPositionsExpressions.eval(env);
+
+  if ((xPositionsExpressions.getTail().cend() - 1)->head().asNumber()
+      != (arguments.getTail().cbegin() + 1)->head().asNumber())
+    xPositionsExpressions.getTail().push_back(*(arguments.getTail().cbegin() + 1));
+
+  Expression yPositionsExpressions("map");
+  yPositionsExpressions.getTail().push_back(lambdaFunction);
+  yPositionsExpressions.getTail().push_back(xPositionsExpressions);
+  yPositionsExpressions = yPositionsExpressions.eval(env);
+
+  /// Create a vector of x and y positions
+  std::vector<double> xPositions;
+  std::vector<double> yPositions;
+
+  for (auto point:xPositionsExpressions.getTail()) {
+    xPositions.emplace_back(point.head().asNumber());
+  }
+  for (auto point:yPositionsExpressions.getTail()) {
+    yPositions.emplace_back(point.head().asNumber());
+  }
+
+  /// Create Scale Factor
+  double yMax, xMax, xMin, yMin;
+  double xScaleFactor = scaleFactor(xPositions, xMax, xMin);
+  double yScaleFactor = scaleFactor(yPositions, yMax, yMin);
+
+  for (auto &x:xPositions) {
+    x = x * xScaleFactor;
+  }
+
+  /// You must flip the y value
+  for (auto &y:yPositions) {
+    y = y * -yScaleFactor;
+  }
+  yMax = -yMax;
+  yMin = -yMin;
+
+  Expression result;
+
+  /// Create the graph border
+  result.getTail().emplace_back(Expression(xMin, yMax, xMin, yMin, 0));
+  result.getTail().emplace_back(Expression(xMax, yMax, xMax, yMin, 0));
+  result.getTail().emplace_back(Expression(xMin, yMax, xMax, yMax, 0));
+  result.getTail().emplace_back(Expression(xMin, yMin, xMax, yMin, 0));
+
+  /// Find Y Axis
+  if (xMax > 0 && xMin < 0)
+    result.getTail().emplace_back(Expression(0, yMax, 0, yMin, 0));
+
+  /// Find X Axis
+  bool inGraph = yMax < 0 && yMin > 0;
+  bool belowGraph = yMax < 0 && yMin < 0;
+  bool aboveGraph = yMax > 0 && yMin > 0;
+  if (inGraph)
+    result.getTail().emplace_back(Expression(xMax, 0, xMin, 0, 0));
+
+  /// Add Graph Labels
+  result.getTail().emplace_back(Expression(title, xMax - ((xMax - xMin) / 2), (yMax - 3), textScale, 0));
+  result.getTail().emplace_back(Expression(abscLabel, xMax - ((xMax - xMin) / 2), (yMin + 3), textScale, 0));
+  result.getTail().emplace_back(Expression(ordLabel,
+                                           (xMin - 3),
+                                           yMin - (yMin - yMax) / 2,
+                                           textScale,
+                                           -std::atan2(0, -1) / 2));
+
+  /// Add Graph number labels
+  std::stringstream ss;
+  ss << std::setprecision(2);
+  ss << yMax / -yScaleFactor;
+  result.getTail().emplace_back(Expression(ss.str(), (xMin - 2), yMax, textScale, 0));
+  ss.str("");
+  ss << yMin / -yScaleFactor;
+  result.getTail().emplace_back(Expression(ss.str(), (xMin - 2), yMin, textScale, 0));
+  ss.str("");
+  ss << xMax / xScaleFactor;
+  result.getTail().emplace_back(Expression(ss.str(), xMax, (yMin + 2), textScale, 0));
+  ss.str("");
+  ss << xMin / xScaleFactor;
+  result.getTail().emplace_back(Expression(ss.str(), xMin, (yMin + 2), textScale, 0));
+
+  /// Add Lines
+  for (std::size_t it = 0; it < xPositions.size() - 1; it++) {
+    result.getTail().emplace_back(Expression(*(xPositions.cbegin() + it),
+                                             *(yPositions.cbegin() + it),
+                                             *(xPositions.cbegin() + it + 1),
+                                             *(yPositions.cbegin() + it + 1),
+                                             0));
+  }
+
+  return result;
+
+}
+
 // this is a simple recursive version. the iterative version is more
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
@@ -363,6 +492,8 @@ Expression Expression::eval(Environment &env) {
     // handle map special-form
   else if (m_head.isSymbol() && m_head.asSymbol() == "map")
     return handle_map(env);
+  else if (m_head.isSymbol() && m_head.asSymbol() == "continuous-plot")
+    return handle_continuousPlot(env);
     // else attempt to treat as procedure
   else {
     std::vector<Expression> results;
@@ -460,3 +591,22 @@ bool operator!=(const Expression &left, const Expression &right) noexcept {
 
   return !(left == right);
 }
+
+double scaleFactor(const std::vector<double> &positions, double &max, double &min) {
+
+  max = *positions.cbegin();
+  min = *positions.cbegin();
+  for (auto &pos:positions) {
+    if (max < pos)
+      max = pos;
+    if (min > pos)
+      min = pos;
+  }
+
+  double scaleFact = 20 / (max - min);
+  max *= scaleFact;
+  min *= scaleFact;
+
+  return scaleFact;
+}
+

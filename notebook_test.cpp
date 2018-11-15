@@ -96,6 +96,7 @@ private slots:
   void testDefaultLine();
   void testDiscretePlotLayout();
   void testContinuousPlotLayout();
+  void testContinuousSinPlot();
 
 private:
   InputWidget *input;
@@ -291,7 +292,8 @@ void NotebookTest::testDiscretePlotLayout() {
 }
 
 void NotebookTest::testContinuousPlotLayout() {
-  std::string program = R"((begin
+  std::string program = R"(
+(begin
     (define f (lambda (x)
         (+ (* 2 x) 1)))
     (continuous-plot f (list -2 2)
@@ -299,6 +301,14 @@ void NotebookTest::testContinuousPlotLayout() {
         (list "title" "A continuous linear function")
         (list "abscissa-label" "x")
         (list "ordinate-label" "y"))))
+)";
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+}
+
+void NotebookTest::testContinuousSinPlot() {
+  std::string program = R"(
+(begin (define f (lambda (x) (sin x))) (continuous-plot f (list (- pi) pi)))
 )";
   input->setPlainText(QString::fromStdString(program));
   QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);

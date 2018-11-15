@@ -347,7 +347,6 @@ Expression Expression::handle_continuousPlot(Environment &env) {
   Expression lambdaFunction = *m_tail.cbegin();
   Expression arguments = (m_tail.begin() + 1)->eval(env);
 
-
   /// Create Data
   double stepSize =
       (arguments.getTail().cbegin()->head().asNumber() - (arguments.getTail().cbegin() + 1)->head().asNumber()) / -50;
@@ -377,6 +376,48 @@ Expression Expression::handle_continuousPlot(Environment &env) {
     yPositions.emplace_back(point.head().asNumber());
   }
 
+  Expression result;
+
+  /// Smooth Lines
+  /// Algorithm is a, b, c where b is vertex.
+  bool antiAliased = true;
+  for (int8_t i = 0; i < 10 && antiAliased; i++) {
+    bool addedPoint = false;
+    antiAliased = false;
+    for (std::size_t it = 0; it < xPositions.size() - 2; it++) {
+      double angle = std::abs((std::atan2(
+          *(yPositions.cbegin() + it + (addedPoint ? 3 : 2)) - *(yPositions.cbegin() + it + (addedPoint ? 2 : 1)),
+          *(xPositions.cbegin() + it + (addedPoint ? 3 : 2)) - *(xPositions.cbegin() + it + (addedPoint ? 2 : 1)))
+          - std::atan2(
+              *(yPositions.cbegin() + it) - *(yPositions.cbegin() + it + (addedPoint ? 2 : 1)),
+              *(xPositions.cbegin() + it)
+                  - *(xPositions.cbegin() + it + (addedPoint ? 2 : 1)))) * -180 / std::atan2(0, -1));
+      if (angle < 175 || angle > 185) {
+        double mid1 = *(xPositions.cbegin() + it)
+            + (*(xPositions.cbegin() + it) - *(xPositions.cbegin() + it + (addedPoint ? 2 : 1))) / 2;
+        double mid2 =
+            *(xPositions.cbegin() + it + (addedPoint ? 2 : 1)) - (*(xPositions.cbegin() + it + (addedPoint ? 3 : 2))
+                - *(xPositions.cbegin() + it + (addedPoint ? 2 : 1))) / 2;
+
+        if (!addedPoint) {
+          lambdaFunction.getTail().clear();
+          lambdaFunction.getTail().emplace_back(Expression(mid1));
+          yPositions.emplace((yPositions.cbegin() + it), lambdaFunction.eval(env).head().asNumber());
+          xPositions.emplace((xPositions.cbegin() + it), mid1);
+        }
+        it++;
+        lambdaFunction.getTail().clear();
+        lambdaFunction.getTail().emplace_back(Expression(mid2));
+        yPositions.emplace((yPositions.cbegin() + it + 1), lambdaFunction.eval(env).head().asNumber());
+        xPositions.emplace((xPositions.cbegin() + it + 1), mid2);
+        addedPoint = true;
+        antiAliased = true;
+      } else {
+        addedPoint = false;
+      }
+    }
+  }
+
   /// Create Scale Factor
   double yMax, xMax, xMin, yMin;
   double xScaleFactor = scaleFactor(xPositions, xMax, xMin);
@@ -392,8 +433,6 @@ Expression Expression::handle_continuousPlot(Environment &env) {
   }
   yMax = -yMax;
   yMin = -yMin;
-
-  Expression result;
 
   /// Create the graph border
   result.getTail().emplace_back(Expression(xMin, yMax, xMin, yMin, 0));
@@ -450,13 +489,12 @@ Expression Expression::handle_continuousPlot(Environment &env) {
   ss << xMin / xScaleFactor;
   result.getTail().emplace_back(Expression(ss.str(), xMin, (yMin + 2), textScale, 0));
 
+
+
   /// Add Lines
   for (std::size_t it = 0; it < xPositions.size() - 1; it++) {
-    result.getTail().emplace_back(Expression(*(xPositions.cbegin() + it),
-                                             *(yPositions.cbegin() + it),
-                                             *(xPositions.cbegin() + it + 1),
-                                             *(yPositions.cbegin() + it + 1),
-                                             0));
+    result.getTail().emplace_back(Expression(*(xPositions.cbegin() + it), *(yPositions.cbegin() + it),
+                                             *(xPositions.cbegin() + it + 1), *(yPositions.cbegin() + it + 1), 0));
   }
 
   return result;

@@ -786,13 +786,13 @@ TEST_CASE("Test arithmetic Complex procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ 1 -2)",
-        "(+ -3 1 1)",
-        "(- 1)",
-        "(- 1 2)",
-        "(* 1 -1)",
-        "(* 1 1 -1)",
-        "(/ -1 1)",
-        "(/ 1 -1)"};
+                                         "(+ -3 1 1)",
+                                         "(- 1)",
+                                         "(- 1 2)",
+                                         "(* 1 -1)",
+                                         "(* 1 1 -1)",
+                                         "(/ -1 1)",
+                                         "(/ 1 -1)"};
 
     for (auto s : programs) {
       Expression result = run(s);
@@ -805,10 +805,10 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 
   {
     std::vector<std::string> programs = {"(+ -1 (- I))",
-        "(+ -3 1 1 (- I))",
-        "(- -1  I)",
-        "(* 1 (+ -1 (- I)))",
-        "(* 1 I I I I (+ -1 (- I)))",};
+                                         "(+ -3 1 1 (- I))",
+                                         "(- -1  I)",
+                                         "(* 1 (+ -1 (- I)))",
+                                         "(* 1 I I I I (+ -1 (- I)))",};
     std::complex<double> comp(-1, -1);
     for (auto s : programs) {
       Expression result = run(s);
@@ -820,9 +820,9 @@ TEST_CASE("Test arithmetic procedures", "[interpreter]") {
 TEST_CASE("Test some semantically invalid expresions", "[interpreter]") {
 
   std::vector<std::string> programs = {"(@ none)", // so such procedure
-      "(- 1 1 2)", // too many arguments
-      "(define begin 1)", // redefine special form
-      "(define pi 3.14)"}; // redefine builtin symbol
+                                       "(- 1 1 2)", // too many arguments
+                                       "(define begin 1)", // redefine special form
+                                       "(define pi 3.14)"}; // redefine builtin symbol
   for (auto s : programs) {
     Interpreter interp;
 
@@ -1581,6 +1581,48 @@ TEST_CASE("Test descrete-plot", "[interpreter]") {
         "(begin (define f (lambda (x) (list x (+ (* 2 x) 1)))) (discrete-plot (map f (range -2 2 0.5)) (list (list \"title\" \"The Data\") (list \"abscissa-label\" \"X Label\") (list \"ordinate-label\" \"Y Label\") (list \"text-scale\" 1))))";
     INFO(program);
     Expression result = run(program);
+
+    REQUIRE(result.getTail().size() == 31);
+  }
+  {
+    std::string program =
+        "(begin (define f (lambda (x) (list x (+ (* -5 x) 1)))) (discrete-plot (map f (range 6 10 0.5)) (list (list \"title\" \"The Data\") (list \"abscissa-label\" \"X Label\") (list \"ordinate-label\" \"Y Label\") (list \"text-scale\" 1))))";
+    INFO(program);
+    Expression result = run(program);
+
+    REQUIRE(result.getTail().size() == 29);
+  }
+  {
+    std::string program =
+        "(begin (define f (lambda (x) (list x (+ (* 5 x) 1)))) (discrete-plot (map f (range 6 10 0.5)) (list (list \"title\" \"The Data\") (list \"abscissa-label\" \"X Label\") (list \"ordinate-label\" \"Y Label\") (list \"text-scale\" 1))))";
+    INFO(program);
+    Expression result = run(program);
+
+    REQUIRE(result.getTail().size() == 29);
+  }
+}
+
+TEST_CASE("Test continuous-plot", "[interpreter]") {
+  {
+    std::string program =
+        "(begin\n"
+        "    (define f (lambda (x)\n"
+        "        (+ (* 2 x) 1)))\n"
+        "    (continuous-plot f (list -2 2)\n"
+        "        (list\n"
+        "        (list \"title\" \"A continuous linear function\")\n"
+        "        (list \"abscissa-label\" \"x\")\n"
+        "        (list \"ordinate-label\" \"y\")"
+        "        (list \"text-scale\" .1))))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result.getTail().size() == 63);
+  }
+  {
+    std::string program = "(begin (define f (lambda (x) (sin x))) (continuous-plot f (list (- pi) pi)))";
+    INFO(program);
+    Expression result = run(program);
+    REQUIRE(result.getTail().size() == 82);
   }
 }
 

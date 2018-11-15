@@ -353,24 +353,11 @@ Expression getProperty(const std::vector<Expression> &args) {
 
 Expression discretePlot(const std::vector<Expression> &args) {
 
-  if (!nargs_equal(args, 2))
+  if (args.size() < 1)
     throw SemanticError("Error: Invalid number of parameters to discrete-plot");
 
-  if (!args.cbegin()->isList() || !(args.cbegin() + 1)->isList())
+  if (!args.cbegin()->isList())
     throw SemanticError("Error: Invalid type of argument to discrete-plot");
-
-  std::string title, abscLabel, ordLabel;
-  double textScale = 1;
-  for (auto &option:(args.cbegin() + 1)->getTail()) {
-    if (option.getTail().cbegin()->head().asString() == "title")
-      title = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "abscissa-label")
-      abscLabel = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "ordinate-label")
-      ordLabel = (option.getTail().cbegin() + 1)->head().asString();
-    else if (option.getTail().cbegin()->head().asString() == "text-scale")
-      textScale = (option.getTail().cbegin() + 1)->head().asNumber();
-  }
 
   std::vector<double> xPositions;
   std::vector<double> yPositions;
@@ -430,14 +417,28 @@ Expression discretePlot(const std::vector<Expression> &args) {
                                                *(xPositions.cbegin() + i), yMin, 0));
   }
 
-  /// Add Graph Labels
-  result.getTail().emplace_back(Expression(title, xMax - ((xMax - xMin) / 2), (yMax - 3), textScale, 0));
-  result.getTail().emplace_back(Expression(abscLabel, xMax - ((xMax - xMin) / 2), (yMin + 3), textScale, 0));
-  result.getTail().emplace_back(Expression(ordLabel,
-                                           (xMin - 3),
-                                           yMin - (yMin - yMax) / 2,
-                                           textScale,
-                                           -std::atan2(0, -1) / 2));
+  double textScale = 1;
+  if (args.size() == 2 && (args.cbegin() + 1)->isList()) {
+    std::string title, abscLabel, ordLabel;
+    for (auto &option:(args.cbegin() + 1)->getTail()) {
+      if (option.getTail().cbegin()->head().asString() == "title")
+        title = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "abscissa-label")
+        abscLabel = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "ordinate-label")
+        ordLabel = (option.getTail().cbegin() + 1)->head().asString();
+      else if (option.getTail().cbegin()->head().asString() == "text-scale")
+        textScale = (option.getTail().cbegin() + 1)->head().asNumber();
+    }
+    /// Add Graph Labels
+    result.getTail().emplace_back(Expression(title, xMax - ((xMax - xMin) / 2), (yMax - 3), textScale, 0));
+    result.getTail().emplace_back(Expression(abscLabel, xMax - ((xMax - xMin) / 2), (yMin + 3), textScale, 0));
+    result.getTail().emplace_back(Expression(ordLabel,
+                                             (xMin - 3),
+                                             yMin - (yMin - yMax) / 2,
+                                             textScale,
+                                             -std::atan2(0, -1) / 2));
+  }
 
   /// Add Graph number labels
   std::stringstream ss;

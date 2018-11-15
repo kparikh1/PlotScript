@@ -337,7 +337,7 @@ Expression Expression::handle_map(Environment &env) {
 
 Expression Expression::handle_continuousPlot(Environment &env) {
 
-  if (m_tail.size() >= 2)
+  if (m_tail.size() < 2)
     throw SemanticError("Error: Invalid number of parameters to continuous-plot");
 
   if (!(m_tail.cbegin() + 1)->isList())
@@ -406,14 +406,11 @@ Expression Expression::handle_continuousPlot(Environment &env) {
     result.getTail().emplace_back(Expression(0, yMax, 0, yMin, 0));
 
   /// Find X Axis
-  bool inGraph = yMax < 0 && yMin > 0;
-  bool belowGraph = yMax < 0 && yMin < 0;
-  bool aboveGraph = yMax > 0 && yMin > 0;
-  if (inGraph)
+  if (yMax < 0 && yMin > 0)
     result.getTail().emplace_back(Expression(xMax, 0, xMin, 0, 0));
 
   double textScale = 1;
-  if (m_tail.size() == 3 && (m_tail.cbegin()+2)->isList()) {
+  if (m_tail.size() == 3 && (m_tail.cbegin() + 2)->isList()) {
     Expression properties = (m_tail.begin() + 2)->eval(env);
 
     /// Get Properties

@@ -12,7 +12,19 @@
 #include "environment.hpp"
 #include "semantic_error.hpp"
 
-bool Interpreter::parseStream(std::istream & expression) noexcept{
+std::stringstream startUp;
+
+void readStartUpFile() {
+  if (startUp.str().empty()) {
+    std::ifstream ifs(STARTUP_FILE);
+    if (ifs) {
+      startUp << ifs.rdbuf();
+      ifs.close();
+    }
+  }
+}
+
+bool Interpreter::parseStream(std::istream &expression) noexcept {
 
   TokenSequenceType tokens = tokenize(expression);
 
@@ -20,17 +32,18 @@ bool Interpreter::parseStream(std::istream & expression) noexcept{
 
   return (ast != Expression());
 };
-				     
 
-Expression Interpreter::evaluate(){
+Expression Interpreter::evaluate() {
 
   return ast.eval(env);
 }
 Interpreter::Interpreter() {
 
-  std::ifstream ifs(STARTUP_FILE);
+  readStartUpFile();
 
-  parseStream(ifs);
+  parseStream(startUp);
   evaluate();
 
+  startUp.clear();
+  startUp.seekg(0);
 }

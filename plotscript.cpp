@@ -2,9 +2,12 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <thread>
 
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
+#include "Consumer.hpp"
+#include "MessageQueue.hpp"
 
 void prompt() {
   std::cout << "\nplotscript> ";
@@ -67,7 +70,15 @@ int eval_from_command(const std::string &argexp) {
 
 // A REPL is a repeated read-eval-print loop
 void repl() {
-  Interpreter interp;
+  // Interpreter interp;
+
+  std::size_t id = 1;
+  MessageQueue<std::istringstream> in;
+  MessageQueue<Expression> out;
+  Consumer worker(&in, &out, id);
+  id++;
+
+  std::thread th1(worker.run, true);
 
   while (!std::cin.eof()) {
 
@@ -78,17 +89,18 @@ void repl() {
 
     std::istringstream expression(line);
 
-    if (!interp.parseStream(expression)) {
-      error("Invalid Expression. Could not parse.");
-    } else {
-      try {
-        Expression exp = interp.evaluate();
-        std::cout << exp << std::endl;
-      }
-      catch (const SemanticError &ex) {
-        std::cerr << ex.what() << std::endl;
-      }
-    }
+
+//    if (!interp.parseStream(expression)) {
+//      error("Invalid Expression. Could not parse.");
+//    } else {
+//      try {
+//        Expression exp = interp.evaluate();
+//        std::cout << exp << std::endl;
+//      }
+//      catch (const SemanticError &ex) {
+//        std::cerr << ex.what() << std::endl;
+//      }
+//    }
   }
 }
 

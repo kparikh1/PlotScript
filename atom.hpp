@@ -33,7 +33,7 @@ class Atom {
   /// Construct an Atom directly from a Token and is known string type
   explicit Atom(const Token &token, bool &string);
 
-  /// Construct an Atom directly from a string value
+  /// Construct an Atom directly from a string value and the bool decides if it is an error expression
   explicit Atom(const std::string &value, const bool &string);
 
   /// Copy-construct an Atom
@@ -63,6 +63,9 @@ class Atom {
   /// predicate to determine if an Atom is of type String
   bool isString() const noexcept;
 
+  /// predicate to determine if an Atom is of type String
+  bool isError() const noexcept;
+
   /// returns if it is complex or a number
   bool isNumCom() const noexcept;
 
@@ -74,6 +77,9 @@ class Atom {
 
   /// value of Atom as a string, returns empty-string if not a string
   std::string asString() const noexcept;
+
+  /// value of Atom as a string, returns empty-string if not a string
+  std::string asError() const noexcept;
 
   /// value of Atom as a complex number, returns 0 if not a Complex
   std::complex<double> asComplex() const noexcept;
@@ -87,7 +93,7 @@ class Atom {
  private:
 
   // internal enum of known types
-  enum Type { NoneKind, NumberKind, SymbolKind, ComplexKind, StringKind };
+  enum Type { NoneKind, NumberKind, SymbolKind, ComplexKind, StringKind, ErrorKind };
 
   // track the type
   Type m_type = NoneKind;
@@ -110,6 +116,9 @@ class Atom {
 
   // helper to set type and value of String
   void setString(const std::string &value);
+
+  // helper to set type and value of Error
+  void setError(const std::string &value);
 
   // helper to set type and value of Complex
   void setComplex(const std::complex<double> &comp);

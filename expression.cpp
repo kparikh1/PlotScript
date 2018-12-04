@@ -31,8 +31,8 @@ Expression::Expression(const std::string &value) {
   m_head = Atom(value);
 }
 
-Expression::Expression(const std::string &value, const bool &string) {
-  m_head = Atom(value, string);
+Expression::Expression(const std::string &value, const bool &error) {
+  m_head = Atom(value, error);
 }
 
 Expression::Expression(const std::complex<double> &value) {
@@ -543,6 +543,11 @@ Expression Expression::eval(Environment &env) {
 }
 
 std::ostream &operator<<(std::ostream &out, const Expression &exp) {
+
+  if (exp.head().isError()) {
+    out << exp.head();
+    return out;
+  }
 
   if (exp.head().isNone() && exp.getTail().empty()) {
     out << "NONE";

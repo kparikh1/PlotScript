@@ -65,7 +65,7 @@ Atom::Atom(const std::string &value, const bool &string) {
   if (string)
     setString(value);
   else
-    setSymbol(value);
+    setError(value);
 }
 
 Atom::Atom(const Atom &x) : Atom() {
@@ -77,6 +77,8 @@ Atom::Atom(const Atom &x) : Atom() {
     setComplex(x.complexValue);
   } else if (x.isString()) {
     setString(stringValue);
+  } else if (x.isError()) {
+    setError(stringValue);
   }
 }
 
@@ -93,6 +95,8 @@ Atom &Atom::operator=(const Atom &x) {
       setComplex(x.complexValue);
     } else if (x.m_type == StringKind)
       setString(x.stringValue);
+    else if (x.m_type == ErrorKind)
+      setError(x.stringValue);
   }
   return *this;
 }
@@ -100,7 +104,7 @@ Atom &Atom::operator=(const Atom &x) {
 Atom::~Atom() {
 
 // we need to ensure the destructor of the symbol string is called
-  if (m_type == SymbolKind || m_type == StringKind) {
+  if (m_type == SymbolKind || m_type == StringKind || m_type == ErrorKind) {
     stringValue.~
         basic_string();
   }
@@ -141,7 +145,7 @@ void Atom::setNumber(double value) {
 void Atom::setSymbol(const std::string &value) {
 
   // we need to ensure the destructor of the symbol string is called
-  if (m_type == SymbolKind || m_type == StringKind) {
+  if (m_type == SymbolKind || m_type == StringKind || m_type == ErrorKind) {
     stringValue.~basic_string();
   }
 
@@ -184,6 +188,17 @@ std::string Atom::asString() const noexcept {
   return result;
 }
 
+std::string Atom::asError() const noexcept {
+
+  std::string result;
+
+  if (m_type == ErrorKind) {
+    result = stringValue;
+  }
+
+  return result;
+}
+
 std::complex<double> Atom::asComplex() const noexcept {
 
   return isComplex() ? complexValue : std::complex<double>(0, 0);
@@ -199,36 +214,36 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-  case NoneKind:
-    if (right.m_type != NoneKind)
-      return false;
-    break;
-  case NumberKind: {
-    if (right.m_type != NumberKind)
-      return false;
-    if (Epsilon(complexValue.real(), right.complexValue.real()))
-      return false;
-  }
-    break;
-  case ComplexKind: {
-    if (right.m_type != ComplexKind ||
-        Epsilon(complexValue.real(), right.complexValue.real())
-        || Epsilon(complexValue.imag(), right.complexValue.imag()))
-      return false;
-  }
-    break;
-  case SymbolKind: {
-    if (right.m_type != SymbolKind)
-      return false;
-    return stringValue == right.stringValue;
-  }
-  case StringKind: {
-    if (right.m_type != StringKind)
-      return false;
-    return stringValue == right.stringValue;
-  }
-    break;
-  default:return false;
+    case NoneKind:
+      if (right.m_type != NoneKind)
+        return false;
+      break;
+    case NumberKind: {
+      if (right.m_type != NumberKind)
+        return false;
+      if (Epsilon(complexValue.real(), right.complexValue.real()))
+        return false;
+    }
+      break;
+    case ComplexKind: {
+      if (right.m_type != ComplexKind ||
+          Epsilon(complexValue.real(), right.complexValue.real())
+          || Epsilon(complexValue.imag(), right.complexValue.imag()))
+        return false;
+    }
+      break;
+    case SymbolKind: {
+      if (right.m_type != SymbolKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+    case StringKind: {
+      if (right.m_type != StringKind)
+        return false;
+      return stringValue == right.stringValue;
+    }
+      break;
+    default:return false;
   }
 
   return true;
@@ -239,7 +254,7 @@ bool Atom::isString() const noexcept {
 
 void Atom::setString(const std::string &value) {
   // we need to ensure the destructor of the symbol string is called
-  if (m_type == StringKind || m_type == SymbolKind) {
+  if (m_type == StringKind || m_type == SymbolKind || m_type == ErrorKind) {
     stringValue.~basic_string();
   }
 
@@ -248,6 +263,20 @@ void Atom::setString(const std::string &value) {
   // copy construct in place
   new(&stringValue) std::string(value);
 }
+
+void Atom::setError(const std::string &value) {
+
+  // we need to ensure the destructor of the symbol string is called
+  if (m_type == SymbolKind || m_type == StringKind || m_type == ErrorKind) {
+    stringValue.~basic_string();
+  }
+
+  m_type = ErrorKind;
+
+  // copy construct in place
+  new(&stringValue) std::string(value);
+}
+
 void Atom::setNone() {
   if (m_type == SymbolKind || m_type == StringKind)
     stringValue.~basic_string();
@@ -272,6 +301,9 @@ std::ostream &operator<<(std::ostream &out, const Atom &a) {
   }
   if (a.isString()) {
     out << "\"" << a.asString() << "\"";
+  }
+  if (a.isError()) {
+    out << a.asError();
   }
   return out;
 }

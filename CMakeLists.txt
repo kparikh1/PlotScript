@@ -11,7 +11,7 @@ set(interpreter_src
         expression.hpp expression.cpp
         parse.hpp parse.cpp
         interpreter.hpp interpreter.cpp
-        )
+        MessageQueue.hpp Consumer.cpp Consumer.hpp)
 
 # EDIT
 # add any files you create related to interpreter unit testing here
@@ -25,7 +25,7 @@ set(unittest_src
         semantic_error.hpp
         token_tests.cpp
         unit_tests.cpp
-        )
+        MessageQueue.hpp Consumer.cpp Consumer.hpp)
 
 # EDIT
 # add source for any TUI modules here
@@ -100,8 +100,8 @@ if (DEFINED ENV{ECE3574_REFERENCE_ENV})
     set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     set_target_properties(interpreter PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS})
     set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS})
-    target_link_libraries(unit_tests interpreter gcov)
-    target_link_libraries(plotscript interpreter gcov)
+    target_link_libraries(unit_tests interpreter pthread gcov)
+    target_link_libraries(plotscript interpreter pthread gcov)
     add_custom_target(coverage
             COMMAND ${CMAKE_COMMAND} -E env "ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
             ${CMAKE_CURRENT_SOURCE_DIR}/scripts/coverage.sh)
@@ -125,14 +125,14 @@ endif ()
 
 if (Qt5Widgets_FOUND AND Qt5Test_FOUND)
 
-    add_executable(notebook ${gui_main} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp)
+    add_executable(notebook ${gui_main} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp MessageQueue.hpp Consumer.cpp Consumer.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets pthread gcov)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets)
     endif ()
 
-    add_executable(notebook_test ${gui_test_src} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp)
+    add_executable(notebook_test ${gui_test_src} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp MessageQueue.hpp Consumer.cpp Consumer.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test pthread gcov)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)

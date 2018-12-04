@@ -11,6 +11,7 @@ set(interpreter_src
         expression.hpp expression.cpp
         parse.hpp parse.cpp
         interpreter.hpp interpreter.cpp
+        graphingUtil.cpp graphingUtil.hpp
         MessageQueue.hpp Consumer.cpp Consumer.hpp)
 
 # EDIT
@@ -25,23 +26,24 @@ set(unittest_src
         semantic_error.hpp
         token_tests.cpp
         unit_tests.cpp
+        graphingUtil.cpp graphingUtil.hpp
         MessageQueue.hpp Consumer.cpp Consumer.hpp)
 
 # EDIT
 # add source for any TUI modules here
 set(tui_src
-        )
+        graphingUtil.cpp graphingUtil.hpp)
 
 # EDIT
 # add source for any GUI modules here
 set(gui_src
-        )
+        graphingUtil.cpp graphingUtil.hpp)
 
 # EDIT
 # add source for any GUI tests here
 set(gui_test_src
         notebook_test.cpp
-        )
+        graphingUtil.cpp graphingUtil.hpp)
 
 
 # ------------------------------------------------
@@ -51,12 +53,12 @@ set(gui_test_src
 # main entry point for TUI interface
 set(tui_main
         plotscript.cpp
-        )
+        graphingUtil.cpp graphingUtil.hpp)
 
 # main entry point for GUI interface
 set(gui_main
         notebook.cpp
-        )
+        graphingUtil.cpp graphingUtil.hpp)
 
 # try to prevent accidental in-source builds, these cause lots of problems
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -81,14 +83,14 @@ if (UNIX AND STRICT)
 endif ()
 
 # build interpreter library
-add_library(interpreter ${interpreter_src})
+add_library(interpreter ${interpreter_src} graphingUtil.cpp graphingUtil.hpp)
 
 # create the plotscript executable
-add_executable(plotscript ${tui_main} ${tui_src})
+add_executable(plotscript ${tui_main} ${tui_src} graphingUtil.cpp graphingUtil.hpp)
 target_link_libraries(plotscript interpreter)
 
 # create the unit_tests executable
-add_executable(unit_tests ${unittest_src})
+add_executable(unit_tests ${unittest_src} graphingUtil.cpp graphingUtil.hpp)
 target_link_libraries(unit_tests interpreter)
 
 enable_testing()
@@ -125,14 +127,14 @@ endif ()
 
 if (Qt5Widgets_FOUND AND Qt5Test_FOUND)
 
-    add_executable(notebook ${gui_main} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp MessageQueue.hpp Consumer.cpp Consumer.hpp)
+    add_executable(notebook ${gui_main} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets pthread gcov)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook interpreter Qt5::Widgets)
     endif ()
 
-    add_executable(notebook_test ${gui_test_src} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp MessageQueue.hpp Consumer.cpp Consumer.hpp)
+    add_executable(notebook_test ${gui_test_src} ${gui_src} output_widget.cpp output_widget.hpp notebook_app.cpp notebook_app.hpp input_widget.cpp input_widget.hpp token.hpp token.cpp atom.hpp atom.cpp environment.hpp environment.cpp expression.hpp expression.cpp parse.hpp parse.cpp interpreter.hpp interpreter.cpp semantic_error.hpp)
     if (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)
         target_link_libraries(notebook_test interpreter Qt5::Widgets Qt5::Test pthread gcov)
     else (UNIX AND NOT APPLE AND CMAKE_COMPILER_IS_GNUCXX)

@@ -161,7 +161,4 @@ std::ostream &operator<<(std::ostream &out, const Expression &exp);
 /// inequality comparison for two expressions (recursive)
 bool operator!=(const Expression &left, const Expression &right) noexcept;
 
-/// Creates the scalefactor for the graphs and gets their Min and Max
-double scaleFactor(const std::vector<double> &positions, double &max, double &min);
-
 #endif

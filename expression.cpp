@@ -632,19 +632,5 @@ bool operator!=(const Expression &left, const Expression &right) noexcept {
 
 double scaleFactor(const std::vector<double> &positions, double &max, double &min) {
 
-  max = *positions.cbegin();
-  min = *positions.cbegin();
-  for (auto &pos:positions) {
-    if (max < pos)
-      max = pos;
-    if (min > pos)
-      min = pos;
-  }
-
-  double scaleFact = 20 / (max - min);
-  max *= scaleFact;
-  min *= scaleFact;
-
-  return scaleFact;
 }
 

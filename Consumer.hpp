@@ -8,23 +8,25 @@
 #include "MessageQueue.hpp"
 #include "expression.hpp"
 #include <string>
-#include <istream>
 
 // define the mailbox as out thread-safe message queue
-typedef MessageQueue<std::istringstream> IncomingMail;
+typedef MessageQueue<std::string> IncomingMail;
 typedef MessageQueue<Expression> OutgoingMail;
 
 class Consumer {
 
- public:
+public:
 
   Consumer() = default;
   Consumer(IncomingMail *i_MB, OutgoingMail *o_MB, std::size_t ConsumerID)
       : incomingMB(i_MB), outgoingMB(o_MB), id(ConsumerID) {}
 
-  void run(bool ContinueRun);
+  void start();
 
- private:
+private:
+
+  void run();
+
   std::size_t id;
   IncomingMail *incomingMB;
   OutgoingMail *outgoingMB;

@@ -2,21 +2,26 @@
 // Created by kishanp on 12/3/18.
 //
 
-#include <iostream>
+#include <istream>
+#include <thread>
+
 #include "Consumer.hpp"
 #include "interpreter.hpp"
 #include "semantic_error.hpp"
 
-void Consumer::run(bool ContinueRun) {
+void Consumer::run() {
 
-  std::istringstream message;
+  bool ContinueRun = true;
+  std::string message;
   Interpreter interp;
 
   while (ContinueRun) {
     incomingMB->wait_and_pop(message);
-    ContinueRun = (message.str() != "%stop");
+    ContinueRun = (message != "%stop");
 
-    if (!interp.parseStream(message)) {
+    std::istringstream iss(message);
+
+    if (!interp.parseStream(iss)) {
       outgoingMB->push(Expression("Invalid Expression. Could not parse.", false));
     } else {
       try {
@@ -29,4 +34,7 @@ void Consumer::run(bool ContinueRun) {
     }
 
   }
+}
+void Consumer::start() {
+  std::thread th1(&Consumer::run, NULL);
 }

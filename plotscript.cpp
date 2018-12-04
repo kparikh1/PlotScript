@@ -73,22 +73,32 @@ void repl() {
   // Interpreter interp;
 
   std::size_t id = 1;
-  MessageQueue<std::istringstream> in;
+  MessageQueue<std::string> in;
   MessageQueue<Expression> out;
   Consumer worker(&in, &out, id);
   id++;
 
-  std::thread th1(worker.run, true);
+  std::thread th1(&Consumer::run, true, worker);
 
   while (!std::cin.eof()) {
 
     prompt();
     std::string line = readline();
 
-    if (line.empty()) continue;
+    if (line.empty())
+      continue;
 
-    std::istringstream expression(line);
+    in.push(line);
 
+    Expression result;
+    out.wait_and_pop(result);
+
+    if (result.head().isError()) {
+      std::cerr << result << std::endl;
+    } else
+      std::cout << result << std::endl;
+
+    //std::istringstream expression(line);
 
 //    if (!interp.parseStream(expression)) {
 //      error("Invalid Expression. Could not parse.");

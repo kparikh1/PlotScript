@@ -136,6 +136,10 @@ bool Atom::isSymbol() const noexcept {
   return m_type == SymbolKind;
 }
 
+bool Atom::isError() const noexcept {
+  return m_type == ErrorKind;
+}
+
 void Atom::setNumber(double value) {
 
   m_type = NumberKind;
@@ -214,36 +218,36 @@ bool Atom::operator==(const Atom &right) const noexcept {
     return false;
 
   switch (m_type) {
-    case NoneKind:
-      if (right.m_type != NoneKind)
-        return false;
-      break;
-    case NumberKind: {
-      if (right.m_type != NumberKind)
-        return false;
-      if (Epsilon(complexValue.real(), right.complexValue.real()))
-        return false;
-    }
-      break;
-    case ComplexKind: {
-      if (right.m_type != ComplexKind ||
-          Epsilon(complexValue.real(), right.complexValue.real())
-          || Epsilon(complexValue.imag(), right.complexValue.imag()))
-        return false;
-    }
-      break;
-    case SymbolKind: {
-      if (right.m_type != SymbolKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-    case StringKind: {
-      if (right.m_type != StringKind)
-        return false;
-      return stringValue == right.stringValue;
-    }
-      break;
-    default:return false;
+  case NoneKind:
+    if (right.m_type != NoneKind)
+      return false;
+    break;
+  case NumberKind: {
+    if (right.m_type != NumberKind)
+      return false;
+    if (Epsilon(complexValue.real(), right.complexValue.real()))
+      return false;
+  }
+    break;
+  case ComplexKind: {
+    if (right.m_type != ComplexKind ||
+        Epsilon(complexValue.real(), right.complexValue.real())
+        || Epsilon(complexValue.imag(), right.complexValue.imag()))
+      return false;
+  }
+    break;
+  case SymbolKind: {
+    if (right.m_type != SymbolKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+  case StringKind: {
+    if (right.m_type != StringKind)
+      return false;
+    return stringValue == right.stringValue;
+  }
+    break;
+  default:return false;
   }
 
   return true;

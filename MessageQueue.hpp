@@ -11,7 +11,7 @@
 
 template<typename MessageType>
 class MessageQueue {
- public:
+public:
 
   // push message into queue, blocks until available
   void push(MessageType const &message) {
@@ -50,7 +50,7 @@ class MessageQueue {
     the_queue.pop();
   }
 
- private:
+private:
 
   std::queue<MessageType> the_queue;
   mutable std::mutex the_mutex;

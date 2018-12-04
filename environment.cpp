@@ -6,7 +6,6 @@
 
 #include "environment.hpp"
 #include "semantic_error.hpp"
-#include "graphingUtil.hpp"
 
 /*********************************************************************** 
 Helper Functions
@@ -363,16 +362,27 @@ Expression discretePlot(const std::vector<Expression> &args) {
   std::vector<double> xPositions;
   std::vector<double> yPositions;
 
-  graphingUtil discretePlot;
-
-  discretePlot.setPositions(args.cbegin()->getTail());
-  discretePlot.setScaleFactor();
-
-  discretePlot.scalePositions();
+  for (auto point:args.cbegin()->getTail()) {
+    if (!point.isList())
+      throw SemanticError("Error: Invalid list of plot-points to discrete-plot");
+    xPositions.emplace_back(point.getTail().cbegin()->head().asNumber());
+    yPositions.emplace_back((point.getTail().cbegin() + 1)->head().asNumber());
+  }
 
   double yMax, xMax, xMin, yMin;
-  double xScaleFactor = 1;
-  double yScaleFactor = 1;
+  double xScaleFactor = scaleFactor(xPositions, xMax, xMin);
+  double yScaleFactor = scaleFactor(yPositions, yMax, yMin);
+
+  for (auto &x:xPositions) {
+    x = x * xScaleFactor;
+  }
+
+  /// You must flip the y value
+  for (auto &y:yPositions) {
+    y = y * -yScaleFactor;
+  }
+  yMax = -yMax;
+  yMin = -yMin;
 
   Expression result;
 

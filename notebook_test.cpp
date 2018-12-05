@@ -3,6 +3,7 @@
 #include "notebook_app.hpp"
 #include <QDebug>
 
+volatile std::atomic_bool interrupt(false);
 /// Helper Functions
 int findLines(QGraphicsScene *scene, QRectF bbox, qreal margin) {
 
@@ -82,9 +83,9 @@ int intersectsLine(QGraphicsScene *scene, QPointF center, qreal radius) {
 }
 
 class NotebookTest : public QObject {
-Q_OBJECT
+ Q_OBJECT
 
-private slots:
+ private slots:
 
   void initTestCase();
 
@@ -99,7 +100,7 @@ private slots:
   void testContinuousPlotLayout();
   void testContinuousSinPlot();
 
-private:
+ private:
   InputWidget *input;
   OutputWidget *output;
   QGraphicsView *view;

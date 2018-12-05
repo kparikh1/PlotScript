@@ -145,6 +145,7 @@ void repl() {
 
   while (!std::cin.eof()) {
 
+    interrupt = false;
     prompt();
     std::string line = readline();
 

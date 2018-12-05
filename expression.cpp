@@ -8,6 +8,8 @@
 #include "environment.hpp"
 #include "semantic_error.hpp"
 
+volatile std::atomic_bool interrupt(false);
+
 Expression::Expression(const Atom &a) {
 
   m_head = a;

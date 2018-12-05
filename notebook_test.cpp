@@ -3,7 +3,6 @@
 #include "notebook_app.hpp"
 #include <QDebug>
 
-volatile std::atomic_bool interrupt(false);
 /// Helper Functions
 int findLines(QGraphicsScene *scene, QRectF bbox, qreal margin) {
 

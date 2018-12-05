@@ -9,8 +9,6 @@
 #include "interpreter.hpp"
 #include "expression.hpp"
 
-volatile std::atomic_bool interrupt(false);
-
 Expression run(const std::string &program) {
 
   std::istringstream iss(program);

@@ -12,8 +12,6 @@
 #include <csignal>
 #include <cstdlib>
 
-volatile std::atomic_bool interrupt(false);
-
 // *****************************************************************************
 // install a signal handler for Cntl-C on Windows
 // *****************************************************************************

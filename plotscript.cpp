@@ -12,6 +12,8 @@
 #include <csignal>
 #include <cstdlib>
 
+volatile std::atomic_bool interrupt(false);
+
 // *****************************************************************************
 // install a signal handler for Cntl-C on Windows
 // *****************************************************************************
@@ -145,15 +147,15 @@ void repl() {
 
   while (!std::cin.eof()) {
 
-    interrupt = false;
-
     prompt();
     std::string line = readline();
 
     if (line.empty())
       continue;
 
-    if (line == "%reset") {
+    if (line == "%exit")
+      exit(EXIT_SUCCESS);
+    else if (line == "%reset") {
       Expression temp;
       if (th1.joinable()) {
         in.push("%stop");
@@ -188,6 +190,8 @@ int main(int argc, char *argv[]) {
 
   // call the platform-specific code
   install_handler();
+
+  interrupt = false;
 
   if (argc == 2) {
     return eval_from_file(argv[1]);

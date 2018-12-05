@@ -13,7 +13,7 @@ Defines the Expression type and assiciated functions.
 #include "atom.hpp"
 
 /// Variable to control interrupt
-volatile inline std::atomic<bool> interrupt(false);
+extern volatile std::atomic<bool> interrupt;
 
 // forward declare Environment
 class Environment;
@@ -25,7 +25,7 @@ An expression is an atom called the head followed by a (possibly empty)
 list of expressions called the tail.
  */
 class Expression {
-public:
+ public:
 
   typedef std::vector<Expression>::const_iterator ConstIteratorType;
 
@@ -131,7 +131,7 @@ public:
   /// equality comparison for two expressions (recursive)
   bool operator==(const Expression &exp) const noexcept;
 
-private:
+ private:
 
   // the head of the expression
   Atom m_head;

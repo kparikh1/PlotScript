@@ -11,10 +11,10 @@ Define a typed exception to indicate semantic errors during evaluation.
 /*! \class SemanticError
 \brief Exception subclass to indicate semantic errors during evaluation
  */
-class SemanticError: public std::runtime_error {
-public:
+class SemanticError : public std::runtime_error {
+ public:
   /// Construct an exeption with a given message
-  SemanticError(const std::string& message): std::runtime_error(message){};
+  SemanticError(const std::string &message) : std::runtime_error(message) {};
 };
 
 #endif

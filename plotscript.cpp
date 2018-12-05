@@ -134,7 +134,6 @@ int eval_from_command(const std::string &argexp) {
 
 // A REPL is a repeated read-eval-print loop
 void repl() {
-  // Interpreter interp;
 
   std::size_t id = 1;
   MessageQueue<std::string> in;

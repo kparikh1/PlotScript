@@ -7,9 +7,13 @@ Defines the Expression type and assiciated functions.
 #include <string>
 #include <vector>
 #include <map>
+#include <atomic>
 
 #include "token.hpp"
 #include "atom.hpp"
+
+/// Variable to control interrupt
+volatile inline std::atomic<bool> interrupt(false);
 
 // forward declare Environment
 class Environment;

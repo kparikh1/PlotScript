@@ -506,6 +506,10 @@ Expression Expression::handle_continuousPlot(Environment &env) {
 // this limits the practical depth of our AST
 Expression Expression::eval(Environment &env) {
 
+  if (interrupt) {
+    throw SemanticError("Error: Interpreter Kernel Interrupted");
+  }
+
   if (m_tail.empty()) {
     return handle_lookup(m_head, env);
   }

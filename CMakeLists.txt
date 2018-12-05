@@ -25,7 +25,7 @@ set(unittest_src
         semantic_error.hpp
         token_tests.cpp
         unit_tests.cpp
-        MessageQueue.hpp Consumer.cpp Consumer.hpp)
+        MessageQueue.hpp Consumer.cpp Consumer.hpp consumer_test.cpp)
 
 # EDIT
 # add source for any TUI modules here
@@ -85,11 +85,11 @@ add_library(interpreter ${interpreter_src})
 
 # create the plotscript executable
 add_executable(plotscript ${tui_main} ${tui_src})
-target_link_libraries(plotscript interpreter)
+target_link_libraries(plotscript interpreter pthread)
 
 # create the unit_tests executable
 add_executable(unit_tests ${unittest_src})
-target_link_libraries(unit_tests interpreter)
+target_link_libraries(unit_tests interpreter pthread)
 
 enable_testing()
 add_test(unit_tests unit_tests)

@@ -15,17 +15,15 @@ typedef MessageQueue<Expression> OutgoingMail;
 
 class Consumer {
 
-public:
+ public:
 
   Consumer() = default;
   Consumer(IncomingMail *i_MB, OutgoingMail *o_MB, std::size_t ConsumerID)
       : incomingMB(i_MB), outgoingMB(o_MB), id(ConsumerID) {}
 
-  void start();
-
-private:
-
   void run();
+
+ private:
 
   std::size_t id;
   IncomingMail *incomingMB;

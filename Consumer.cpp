@@ -11,13 +11,17 @@
 
 void Consumer::run() {
 
-  bool ContinueRun = true;
   std::string message;
   Interpreter interp;
 
-  while (ContinueRun) {
+  while (1) {
     incomingMB->wait_and_pop(message);
-    ContinueRun = (message != "%stop");
+    if (message == "%stop") {
+      outgoingMB->push(Expression("Threading Command", true));
+      return;
+    } else if (message == "%start") {
+      outgoingMB->push(Expression("Threading Command", true));
+    }
 
     std::istringstream iss(message);
 
@@ -34,7 +38,4 @@ void Consumer::run() {
     }
 
   }
-}
-void Consumer::start() {
-  std::thread th1(&Consumer::run, NULL);
 }

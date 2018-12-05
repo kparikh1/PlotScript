@@ -76,9 +76,8 @@ void repl() {
   MessageQueue<std::string> in;
   MessageQueue<Expression> out;
   Consumer worker(&in, &out, id);
-  id++;
 
-  std::thread th1(&Consumer::run, true, worker);
+  std::thread th1(&Consumer::run, worker);
 
   while (!std::cin.eof()) {
 
@@ -88,16 +87,29 @@ void repl() {
     if (line.empty())
       continue;
 
-    in.push(line);
+    if (line == "%reset") {
+      Expression temp;
+      in.push("%stop");
+      out.wait_and_pop(temp);
+      th1.join();
+      std::thread th2(&Consumer::run, worker);
+      std::swap(th1, th2);
+    } else if (!th1.joinable() && (line == "%start")) {
+      std::thread th2(&Consumer::run, worker);
+      std::swap(th1, th2);
+    } else if (th1.joinable() && (line != "%start")) {
+      in.push(line);
 
-    Expression result;
-    out.wait_and_pop(result);
+      Expression result;
+      out.wait_and_pop(result);
 
-    if (result.head().isError()) {
-      std::cerr << result << std::endl;
-    } else
-      std::cout << result << std::endl;
-
+      if (result.head().isString() && (result.head().asString() == "Threading Command") && th1.joinable()) {
+        th1.join();
+      } else if (result.head().isError()) {
+        std::cerr << result << std::endl;
+      } else
+        std::cout << result << std::endl;
+    }
     //std::istringstream expression(line);
 
 //    if (!interp.parseStream(expression)) {

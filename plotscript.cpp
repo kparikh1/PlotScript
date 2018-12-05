@@ -89,9 +89,11 @@ void repl() {
 
     if (line == "%reset") {
       Expression temp;
-      in.push("%stop");
-      out.wait_and_pop(temp);
-      th1.join();
+      if (th1.joinable()) {
+        in.push("%stop");
+        out.wait_and_pop(temp);
+        th1.join();
+      }
       std::thread th2(&Consumer::run, worker);
       std::swap(th1, th2);
     } else if (!th1.joinable() && (line == "%start")) {
@@ -109,6 +111,8 @@ void repl() {
         std::cerr << result << std::endl;
       } else
         std::cout << result << std::endl;
+    } else if (!th1.joinable()) {
+      std::cerr << "Error: interpreter kernel not running" << std::endl;
     }
     //std::istringstream expression(line);
 

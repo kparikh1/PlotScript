@@ -106,7 +106,7 @@ void InputWidget::resetInterpreter() {
 }
 
 void InputWidget::interruptInterpreter() {
-  interrupt = true;
+  ;
 }
 
 InputWidget::~InputWidget() {

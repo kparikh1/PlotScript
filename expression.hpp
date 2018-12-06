@@ -12,9 +12,6 @@ Defines the Expression type and assiciated functions.
 #include "token.hpp"
 #include "atom.hpp"
 
-/// Variable to control interrupt
-extern volatile std::atomic<bool> interrupt;
-
 // forward declare Environment
 class Environment;
 

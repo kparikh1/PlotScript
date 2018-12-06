@@ -30,8 +30,7 @@ void OutputWidget::printText(const std::string &text) {
 
   scene->clear();
   QGraphicsTextItem *textItem = scene->addText(QString::fromStdString(newText));
-  textItem->setPos(0 - textItem->boundingRect().width() / 2,
-                   0 - textItem->boundingRect().height() / 2);
+  textItem->setPos(0, 0);
   view->fitInView(0, 0, scene->width(), scene->height(), Qt::KeepAspectRatio);
 
 }

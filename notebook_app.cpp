@@ -4,9 +4,7 @@
 #include "notebook_app.hpp"
 
 NotebookApp::NotebookApp() {
-
-  interrupt = false;
-
+  
   startBtn = new QPushButton();
   startBtn->setObjectName("start");
   startBtn->setText("Start Kernel");

@@ -8,8 +8,6 @@
 #include "environment.hpp"
 #include "semantic_error.hpp"
 
-volatile std::atomic_bool interrupt(false);
-
 Expression::Expression(const Atom &a) {
 
   m_head = a;
@@ -509,10 +507,6 @@ Expression Expression::handle_continuousPlot(Environment &env) {
 // difficult with the ast data structure used (no parent pointer).
 // this limits the practical depth of our AST
 Expression Expression::eval(Environment &env) {
-
-  if (interrupt) {
-    throw SemanticError("Error: Interpreter Kernel Interrupted");
-  }
 
   if (m_tail.empty()) {
     return handle_lookup(m_head, env);

@@ -25,9 +25,9 @@ class Consumer {
 
  private:
 
-  std::size_t id;
   IncomingMail *incomingMB;
   OutgoingMail *outgoingMB;
+  std::size_t id;
 };
 
 #endif //PLOTSCRIPT_CONSUMER_HPP

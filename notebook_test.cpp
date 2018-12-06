@@ -98,6 +98,8 @@ class NotebookTest : public QObject {
   void testDiscretePlotLayout();
   void testContinuousPlotLayout();
   void testContinuousSinPlot();
+  void testStart_StopButton();
+  void testResetButton();
 
  private:
   InputWidget *input;
@@ -121,6 +123,9 @@ void NotebookTest::initTestCase() {
   scene = view->scene();
 
   start = notebook->findChild<QPushButton *>("start");
+  stop = notebook->findChild<QPushButton *>("stop");
+  reset = notebook->findChild<QPushButton *>("reset");
+  interrupt = notebook->findChild<QPushButton *>("interrupt");
 }
 
 void NotebookTest::objectNames() {
@@ -129,7 +134,10 @@ void NotebookTest::objectNames() {
   QVERIFY2(output, "Could not find widget with name: 'output'");
   QVERIFY2(view, "Could not find view");
   QVERIFY2(scene, "Could not find scene");
-  QVERIFY2(start, "Could not find button");
+  QVERIFY2(start, "Could not find start button");
+  QVERIFY2(stop, "Could not find stop button");
+  QVERIFY2(reset, "Could not find reset button");
+  QVERIFY2(interrupt, "Could not find interrupt button");
 }
 
 void NotebookTest::testTextOutput() {
@@ -162,9 +170,6 @@ void NotebookTest::testBasicPoint() {
   auto graphicsObjects = scene->items();
 
   auto *result = (QGraphicsEllipseItem *) *graphicsObjects.cbegin();
-
-  int x = result->rect().center().toPoint().x();
-  int y = result->rect().center().toPoint().y();
 
   QVERIFY2(result->rect().center().toPoint() == QPoint(1, 2), "Invalid point");
   QVERIFY2(result->rect().size().toSize() == QSize(200, 200), "Invalid point size");
@@ -343,6 +348,58 @@ void NotebookTest::testContinuousSinPlot() {
 
   auto items = scene->items();
   //QCOMPARE(items.size(), 82);
+
+}
+
+void NotebookTest::testStart_StopButton() {
+
+  std::string program = R"( (* 2 3) )";
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphicsObjects = scene->items();
+  auto *result = (QGraphicsTextItem *) *graphicsObjects.cbegin();
+  QVERIFY2(result->toPlainText() == QString("(6)"), "(* 2 3) did not evaluate to (6)");
+
+  stop->click();
+
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphicsObject = scene->items();
+  auto *results = (QGraphicsTextItem *) *graphicsObject.cbegin();
+  QVERIFY2(results->toPlainText() == QString("Error: interpreter kernel not running"), "Error was not thrown");
+
+  start->click();
+
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphics = scene->items();
+  auto *answer = (QGraphicsTextItem *) *graphics.cbegin();
+  QVERIFY2(answer->toPlainText() == QString("(6)"), "(* 2 3) did not evaluate to (6)");
+
+}
+
+void NotebookTest::testResetButton() {
+
+  std::string program = R"( (define a 1) )";
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphicsObjects = scene->items();
+  auto *result = (QGraphicsTextItem *) *graphicsObjects.cbegin();
+  QVERIFY2(result->toPlainText() == QString("(1)"), "a was not defined");
+
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphicsObject = scene->items();
+  auto *results = (QGraphicsTextItem *) *graphicsObject.cbegin();
+  QVERIFY2(results->toPlainText() != QString("(1)"), "a was defined");
+
+  reset->click();
+
+  input->setPlainText(QString::fromStdString(program));
+  QTest::keyClick(input, Qt::Key_Return, Qt::ShiftModifier);
+  auto graphics = scene->items();
+  auto *answer = (QGraphicsTextItem *) *graphics.cbegin();
+  QVERIFY2(answer->toPlainText() == QString("(1)"), "a was not redefined");
 
 }
 

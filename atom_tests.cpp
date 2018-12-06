@@ -285,4 +285,45 @@ TEST_CASE("test comparison", "[atom]") {
     REQUIRE(a != b);
     REQUIRE(b == c);
   }
+  {
+    INFO("compare none to number")
+    Atom a;
+    Atom b(1.);
+    REQUIRE(a != b);
+  }
+  {
+    INFO("compare string to number")
+    Atom a("Hello", true);
+    Atom b(1.);
+    REQUIRE(a != b);
+  }
+  {
+    INFO("compare symbol to number")
+    Atom a("Hello");
+    Atom b(1.);
+    REQUIRE(a != b);
+  }
+  {
+    INFO("copy construct a string")
+    Atom a("Hello", true);
+    Atom b(a);
+    REQUIRE(a == b);
+  }
+}
+
+TEST_CASE("Test Errorkind", "[atom]") {
+  {
+    INFO("Create an Error");
+    Atom a("Error:", false);
+    REQUIRE(a.isError());
+    REQUIRE(a.asError() == "Error:");
+    Atom b(a);
+    REQUIRE(b == a);
+    Atom c;
+    c = a;
+    REQUIRE(c == b);
+    Atom d;
+    REQUIRE(d != a);
+  }
+
 }

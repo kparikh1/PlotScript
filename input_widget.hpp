@@ -15,7 +15,6 @@ class InputWidget : public QPlainTextEdit {
  Q_OBJECT
  public:
   InputWidget() = default;
-
   ~InputWidget();
 
   void init();

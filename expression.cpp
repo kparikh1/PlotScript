@@ -22,6 +22,7 @@ Expression::Expression(const Expression &a) {
   for (auto e : a.m_tail) {
     m_tail.emplace_back(e);
   }
+  m_Lambda = a.m_Lambda;
   m_properties = a.m_properties;
 }
 
@@ -51,6 +52,7 @@ Expression &Expression::operator=(const Expression &a) {
       m_tail.emplace_back(e);
     }
   }
+  m_Lambda = a.m_Lambda;
   m_properties = a.m_properties;
 
   return *this;

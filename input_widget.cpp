@@ -110,10 +110,6 @@ void InputWidget::interruptInterpreter() {
 }
 
 InputWidget::~InputWidget() {
-  if (th1.joinable()) {
-    Expression temp;
-    in.push("%stop");
-    out.wait_and_pop(temp);
-    th1.join();
-  }
+  stopInterpreter();
+  delete worker;
 }

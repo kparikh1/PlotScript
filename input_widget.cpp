@@ -32,7 +32,7 @@ void InputWidget::keyPressEvent(QKeyEvent *event) {
       std::swap(th1, th2);
     } else if (th1.joinable() && (line != "%start")) {
       in.push(line);
-
+      setReadOnly(true);
       timer.start(40);
     } else if (!th1.joinable()) {
       emit exceptionThrown("Error: interpreter kernel not running");
@@ -46,6 +46,7 @@ void InputWidget::popResult() {
 
   Expression result;
   if (out.try_pop(result)) {
+    setReadOnly(false);
     timer.stop();
     if (result.head().isString() && (result.head().asString() == "Threading Command") && th1.joinable()) {
       th1.join();

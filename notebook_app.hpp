@@ -6,9 +6,10 @@
 #define PLOTSCRIPT_NOTEBOOK_APP_HPP
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QtWidgets/QPushButton>
+
 #include "input_widget.hpp"
 #include "output_widget.hpp"
-#include "ButtonWidget.hpp"
 
 class NotebookApp : public QWidget {
  Q_OBJECT
@@ -19,10 +20,10 @@ class NotebookApp : public QWidget {
   InputWidget *input;
   OutputWidget *output;
 
-  ButtonWidget *startBtn;
-  ButtonWidget *stopBtn;
-  ButtonWidget *resetBtn;
-  ButtonWidget *interruptBtn;
+  QPushButton *startBtn;
+  QPushButton *stopBtn;
+  QPushButton *resetBtn;
+  QPushButton *interruptBtn;
 };
 
 #endif //PLOTSCRIPT_NOTEBOOK_APP_HPP

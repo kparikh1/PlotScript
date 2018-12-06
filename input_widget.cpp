@@ -66,3 +66,34 @@ void InputWidget::init() {
 
   std::swap(th1, th2);
 }
+void InputWidget::startInterpreter() {
+
+  if (!th1.joinable()) {
+    std::thread th2(&Consumer::run, worker);
+    std::swap(th1, th2);
+  }
+}
+
+void InputWidget::stopInterpreter() {
+  if (th1.joinable()) {
+    Expression temp;
+    in.push("%stop");
+    out.wait_and_pop(temp);
+    th1.join();
+  }
+}
+
+void InputWidget::resetInterpreter() {
+  Expression temp;
+  if (th1.joinable()) {
+    in.push("%stop");
+    out.wait_and_pop(temp);
+    th1.join();
+  }
+  std::thread th2(&Consumer::run, worker);
+  std::swap(th1, th2);
+}
+
+void InputWidget::interruptInterpreter() {
+  interrupt = true;
+}

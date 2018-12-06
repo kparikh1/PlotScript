@@ -5,19 +5,19 @@
 
 NotebookApp::NotebookApp() {
 
-  startBtn = new ButtonWidget();
+  startBtn = new QPushButton();
   startBtn->setObjectName("start");
   startBtn->setText("Start Kernel");
 
-  stopBtn = new ButtonWidget();
+  stopBtn = new QPushButton();
   stopBtn->setObjectName("stop");
   stopBtn->setText("Stop Kernel");
 
-  resetBtn = new ButtonWidget();
+  resetBtn = new QPushButton();
   resetBtn->setObjectName("reset");
   resetBtn->setText("Reset Kernel");
 
-  interruptBtn = new ButtonWidget();
+  interruptBtn = new QPushButton();
   interruptBtn->setObjectName("interrupt");
   interruptBtn->setText("Interrupt");
 
@@ -36,6 +36,12 @@ NotebookApp::NotebookApp() {
 
   connect(input, &InputWidget::exceptionThrown, output, &OutputWidget::printText);
   connect(input, &InputWidget::sendResult, output, &OutputWidget::outputExpression);
+
+  /// Button Signals
+  connect(startBtn, &QPushButton::released, input, &InputWidget::startInterpreter);
+  connect(stopBtn, &QPushButton::released, input, &InputWidget::stopInterpreter);
+  connect(resetBtn, &QPushButton::released, input, &InputWidget::resetInterpreter);
+  connect(interruptBtn, &QPushButton::released, input, &InputWidget::interruptInterpreter);
 
   auto layout = new QVBoxLayout();
 

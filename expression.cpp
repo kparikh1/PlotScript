@@ -509,6 +509,7 @@ Expression Expression::handle_continuousPlot(Environment &env) {
 Expression Expression::eval(Environment &env) {
 
   if (interrupt) {
+    interrupt = false;
     throw SemanticError("Error: Interpreter Kernel Interrupted");
   }
 

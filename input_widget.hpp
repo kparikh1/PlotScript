@@ -28,6 +28,10 @@ class InputWidget : public QPlainTextEdit {
  public slots:
 
   void popResult();
+  void startInterpreter();
+  void stopInterpreter();
+  void resetInterpreter();
+  void interruptInterpreter();
 
  private:
   std::size_t id = 1;

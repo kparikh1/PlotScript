@@ -97,6 +97,8 @@ void InputWidget::stopInterpreter() {
 void InputWidget::resetInterpreter() {
   Expression temp;
   if (th1.joinable()) {
+    in.push("%stop");
+    out.wait_and_pop(temp);
     th1.join();
   }
   std::thread th2(&Consumer::run, worker);

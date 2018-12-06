@@ -144,6 +144,7 @@ void repl() {
 
   while (!std::cin.eof()) {
 
+    interrupt = false;
     prompt();
     std::string line = readline();
 
@@ -187,6 +188,8 @@ int main(int argc, char *argv[]) {
 
   // call the platform-specific code
   install_handler();
+
+  interrupt = false;
 
   if (argc == 2) {
     return eval_from_file(argv[1]);

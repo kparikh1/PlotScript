@@ -16,6 +16,8 @@ class InputWidget : public QPlainTextEdit {
  public:
   InputWidget() = default;
 
+  ~InputWidget();
+
   void init();
 
   void keyPressEvent(QKeyEvent *event) override;

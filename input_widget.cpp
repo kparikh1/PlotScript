@@ -33,7 +33,17 @@ void InputWidget::keyPressEvent(QKeyEvent *event) {
     } else if (th1.joinable() && (line != "%start")) {
       in.push(line);
       setReadOnly(true);
-      timer.start(40);
+      Expression result;
+      out.wait_and_pop(result);
+      setReadOnly(false);
+      if (result.head().isString() && (result.head().asString() == "Threading Command") && th1.joinable()) {
+        th1.join();
+      } else if (result.head().isError()) {
+        emit exceptionThrown(result.head().asError());
+      } else {
+        emit sendResult(result);
+      }//else
+      //timer.start(40);
     } else if (!th1.joinable()) {
       emit exceptionThrown("Error: interpreter kernel not running");
     }
@@ -87,8 +97,6 @@ void InputWidget::stopInterpreter() {
 void InputWidget::resetInterpreter() {
   Expression temp;
   if (th1.joinable()) {
-    in.push("%stop");
-    out.wait_and_pop(temp);
     th1.join();
   }
   std::thread th2(&Consumer::run, worker);
@@ -97,4 +105,13 @@ void InputWidget::resetInterpreter() {
 
 void InputWidget::interruptInterpreter() {
   interrupt = true;
+}
+
+InputWidget::~InputWidget() {
+  if (th1.joinable()) {
+    Expression temp;
+    in.push("%stop");
+    out.wait_and_pop(temp);
+    th1.join();
+  }
 }
